@@ -168,7 +168,7 @@ Les trois premières étaient la même erreur que celle déjà corrigée pour le
 | Réception de voix PTT par l'USB | **confirmée sur matériel (13/10/2026)** : 77 paquets (PTT physique de l'autre radio) et 93 paquets (PTT de l'appli officielle) `02 04 03 00 00` + 5 trames AMR de 12 octets ; le décodage en son (fichier WAV) reste à valider à l'écoute |
 | Bluetooth (connexion, lecture des canaux et des réglages) | **confirmé sur matériel (13/10/2026)**, depuis un PC Windows, `bleak` |
 | Réception de messages texte par le Bluetooth | **confirmée sur matériel** : quatre textes envoyés par l'application officielle reçus et décodés, avec l'expéditeur déclaré |
-| Réception d'une image par le Bluetooth | **confirmée sur matériel** : JPEG de 70 fragments réassemblé (affichage de l'image à valider) |
+| Réception d'une image par le Bluetooth | **confirmée sur matériel** : JPEG de 70 fragments réassemblé, enregistré et affiché correctement (13/10/2026) |
 | Réception de messages texte par l'USB | **non relayée par la radio (trois essais, 13/10/2026)** : textes envoyés depuis l'appli officielle, session ouverte, Dual Watch désactivé ; aucune trame reçue, ni valide ni rejetée (29 logs sans trame corrompue), alors que la voix remontait. La réception du texte passe vraisemblablement par le Bluetooth seulement |
 | Messages texte | **confirmé de bout en bout** |
 | Messages voix, image | implémenté, **non vérifié** |
