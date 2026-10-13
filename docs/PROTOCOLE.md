@@ -163,12 +163,14 @@ Les trois premières étaient la même erreur que celle déjà corrigée pour le
 | Page de programmation (service + navigateur) | **confirmée de bout en bout sur matériel (USB)** : connexion, lecture, écriture vérifiée du canal 19, réglages relus |
 | Position, émission (USB) | **confirmée sur matériel (13/10/2026)** : envoyée depuis le serveur par USB, reçue et affichée comme une localisation par l'application officielle (radio B en Bluetooth). Conditions de l'essai : Dual Watch désactivé, session de messagerie ouverte (`04 07 01`) |
 | Messages texte, émission (USB) | **confirmée sur matériel (13/10/2026)** : « Test A vers appli » envoyé par USB, reçu par l'application officielle |
+| Émission de voix PTT (USB, canal numérique) | **confirmée sur matériel (13/10/2026)** : amorçage officiel (cinq requêtes + session `04 07 01`, **avec 120 ms de pause entre chaque commande**), prise de porteuse acquittée (`82 04 02 00`), paquets de voix ; un son est reçu par l'appli officielle sur l'autre radio. Sans pause entre les commandes d'amorçage, la radio ne répondait à rien. Intelligibilité du son à préciser |
+| Requête `01 03 04` | réponse `81 03 04 48` : probablement le **niveau de batterie** (0x48 = 72 %), à confirmer |
 | Réception de voix PTT par l'USB | **confirmée sur matériel (13/10/2026)** : 77 paquets (PTT physique de l'autre radio) et 93 paquets (PTT de l'appli officielle) `02 04 03 00 00` + 5 trames AMR de 12 octets ; le décodage en son (fichier WAV) reste à valider à l'écoute |
 | Réception de messages texte par l'USB | **non observée** : deux essais (guidé, puis libre), textes envoyés depuis l'appli officielle, session ouverte et Dual Watch désactivé : aucune trame texte, alors que la voix remontait. Le texte reçu passe probablement seulement par le Bluetooth |
 | Messages texte | **confirmé de bout en bout** |
 | Messages voix, image | implémenté, **non vérifié** |
 | PTT numérique | **confirmé** |
-| PTT analogique | **ne fonctionne pas** (aucune porteuse) ; hypothèse : l'amorçage du §7 manque |
+| PTT analogique | **non pris en charge par l'application officielle elle-même** (« PTT mode does not support non-digital channels ») : ce n'est pas un défaut du pont. L'émission analogique se fait avec le bouton PTT physique de la radio |
 | Volume, squelch, TOT, VOX, TX, bruit, tonalité, langue | acquitté seulement |
 | Dual Watch, intervalle TX | porté de l'officiel, jamais relu |
 | Smart Link, requête | **confirmé sur matériel (USB)** : la requête officielle `00 01 04 09` reçoit une réponse (l'ancienne forme du pont n'en recevait pas) |
