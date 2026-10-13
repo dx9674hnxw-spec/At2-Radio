@@ -75,7 +75,13 @@ async def main(args) -> int:
             except (ValueError, IndexError):
                 pass
     radio.on("frame", on_frame)
-    radio.on("message", lambda m: log(f"  [reçu] {m.type} de {m.sender} : {m.text or m.lat or ''}"))
+    def on_message(m):
+        log(f"  [reçu] {m.type} de {m.sender} : {m.text or m.lat or ''}")
+        if m.type == "image" and m.data:
+            name = f"reception-image-{time.strftime('%Y%m%d-%H%M%S')}.jpg"
+            Path(name).write_bytes(m.data)
+            log(f"  [image enregistrée] {name} ({len(m.data)} octets, {m.width}x{m.height} annoncés)")
+    radio.on("message", on_message)
     radio.on("state", lambda s: log(f"  [état poussé par la radio] canal {s.current_channel}"))
     voice = {"packets": 0, "pcm": bytearray()}
 

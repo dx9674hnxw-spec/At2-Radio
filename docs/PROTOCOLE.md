@@ -166,6 +166,9 @@ Les trois premières étaient la même erreur que celle déjà corrigée pour le
 | Émission de voix PTT (USB, canal numérique) | **confirmée sur matériel (13/10/2026)** : amorçage officiel (cinq requêtes + session `04 07 01`, **avec 120 ms de pause entre chaque commande**), prise de porteuse acquittée (`82 04 02 00`), paquets de voix ; un son est reçu par l'appli officielle sur l'autre radio. Sans pause entre les commandes d'amorçage, la radio ne répondait à rien. Intelligibilité du son à préciser |
 | Requête `01 03 04` | réponse `81 03 04 48` : probablement le **niveau de batterie** (0x48 = 72 %), à confirmer |
 | Réception de voix PTT par l'USB | **confirmée sur matériel (13/10/2026)** : 77 paquets (PTT physique de l'autre radio) et 93 paquets (PTT de l'appli officielle) `02 04 03 00 00` + 5 trames AMR de 12 octets ; le décodage en son (fichier WAV) reste à valider à l'écoute |
+| Bluetooth (connexion, lecture des canaux et des réglages) | **confirmé sur matériel (13/10/2026)**, depuis un PC Windows, `bleak` |
+| Réception de messages texte par le Bluetooth | **confirmée sur matériel** : quatre textes envoyés par l'application officielle reçus et décodés, avec l'expéditeur déclaré |
+| Réception d'une image par le Bluetooth | **confirmée sur matériel** : JPEG de 70 fragments réassemblé (affichage de l'image à valider) |
 | Réception de messages texte par l'USB | **non relayée par la radio (trois essais, 13/10/2026)** : textes envoyés depuis l'appli officielle, session ouverte, Dual Watch désactivé ; aucune trame reçue, ni valide ni rejetée (29 logs sans trame corrompue), alors que la voix remontait. La réception du texte passe vraisemblablement par le Bluetooth seulement |
 | Messages texte | **confirmé de bout en bout** |
 | Messages voix, image | implémenté, **non vérifié** |
