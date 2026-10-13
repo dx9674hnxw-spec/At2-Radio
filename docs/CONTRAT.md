@@ -198,10 +198,10 @@ Aide : une phrase sous chaque réglage non évident. Aucun terme technique brut 
 2. ✅ **Inventaire des fonctions officielles** (fait : voir `INVENTAIRE.md`) : lister toutes les fonctions de l'application Android d'origine (`At2Commands.kt` et le reste), les comparer à ce que `at2-bridge` implémente, et en déduire la liste des **écarts à porter** (périmètre complet).
 3. Nouveau dépôt `At2-Radio`, squelette, licence et attributions.
 4. Spécification `PROTOCOLE.md` + vecteurs de test.
-5. 🟡 Bibliothèque `at2radio` (en cours) : façade `Radio` multi-radios, un seul codec de trame, vérification après écriture, format de position officiel. Reste : Smart Link / bouton PTT sur matériel, pipeline d'image, MTU BLE, amorçage à la connexion.
-6. Service v1 + OpenAPI + clé d'API.
-7. Page de programmation, avec mode Web Bluetooth sans service.
-8. Historique SQLite (optionnel).
+5. ✅ Bibliothèque `at2radio` (testée sur matériel en USB) : façade `Radio` multi-radios, un seul codec de trame, vérification après écriture, format de position officiel. Reste : Smart Link / bouton PTT sur matériel, pipeline d'image, MTU BLE, amorçage à la connexion.
+6. ✅ Service v1 + OpenAPI + clé d'API (testé sur matériel en USB).
+7. ✅ Page de programmation (testée sur matériel en USB). Reste : mode Web Bluetooth sans service.
+8. ✅ Historique SQLite (optionnel, testé sur faux transport).
 9. Documentation, exemples, première version publiée.
 
 ## 10. Décisions

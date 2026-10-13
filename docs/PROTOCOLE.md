@@ -158,7 +158,9 @@ Les trois premières étaient la même erreur que celle déjà corrigée pour le
 | Trames, CRC | testé (vecteurs, 6 captures réelles) |
 | Lecture de canaux | **confirmé sur matériel** |
 | Écriture de canaux | **confirmée sur matériel (USB)** : canal 19 vide, écriture de 446,1 MHz relue à l'identique, puis remis à vide ; canal 5 réécrit à l'identique |
-| Lecture de 30 canaux, 12 réglages | **confirmé sur matériel (USB)**, 30/30 canaux et 12/12 réglages |
+| Lecture de 30 canaux, 12 réglages | **confirmé sur matériel (USB)**, 30/30 canaux et 12/12 réglages, par le script et par la page de programmation |
+| Page de programmation (service + navigateur) | **confirmée de bout en bout sur matériel (USB)** : connexion, lecture, écriture vérifiée du canal 19, réglages relus |
+| Messages texte et position, émission | trames **acquittées** par la radio (USB) ; **sortie sur les ondes non vérifiée** (aucun récepteur) |
 | Messages texte | **confirmé de bout en bout** |
 | Messages voix, image | implémenté, **non vérifié** |
 | PTT numérique | **confirmé** |

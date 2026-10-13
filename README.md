@@ -4,7 +4,7 @@ Bibliothèque, service local et page de programmation pour la radio **Baofeng / 
 
 > **Projet communautaire, non affilié à Baofeng ni à Alervites.** Le protocole est issu de la rétro-ingénierie. Tout ce qui n'est pas confirmé sur matériel est marqué comme tel dans [`docs/PROTOCOLE.md`](docs/PROTOCOLE.md) §9.
 >
-> **État : développement.** La bibliothèque, le service HTTP et la page de programmation sont écrits et testés sur un faux transport (119 tests), mais **rien n'a encore été essayé sur une vraie radio**. Voir [`exemples/essai_materiel.py`](exemples/essai_materiel.py).
+> **État : développement.** Testé sur une vraie radio AT2 **en USB** (13/10/2026) : lecture des 30 canaux et des réglages, écriture de canaux et de réglages avec relecture, Smart Link, et la page de programmation de bout en bout. **Pas encore vérifié** : Bluetooth, émission sur les ondes (texte, position, SOS), réception, PTT, voix, image. Voir [`docs/PROTOCOLE.md`](docs/PROTOCOLE.md) §9 et [`exemples/essai_materiel.py`](exemples/essai_materiel.py).
 
 ## Premier message
 
