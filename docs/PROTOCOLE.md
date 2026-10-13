@@ -162,8 +162,9 @@ Les trois premières étaient la même erreur que celle déjà corrigée pour le
 | Lecture de 30 canaux, 12 réglages | **confirmé sur matériel (USB)**, 30/30 canaux et 12/12 réglages, par le script et par la page de programmation |
 | Page de programmation (service + navigateur) | **confirmée de bout en bout sur matériel (USB)** : connexion, lecture, écriture vérifiée du canal 19, réglages relus |
 | Position, émission (USB) | **confirmée sur matériel (13/10/2026)** : envoyée depuis le serveur par USB, reçue et affichée comme une localisation par l'application officielle (radio B en Bluetooth). Conditions de l'essai : Dual Watch désactivé, session de messagerie ouverte (`04 07 01`) |
-| Messages texte, émission | trames acquittées ; **pas encore vu sur un récepteur** (le texte n'a pas été envoyé lors de l'essai concluant) |
-| Réception par l'USB | **non observée** : à deux radios en USB, la radio réceptrice n'a rien remonté à l'ordinateur alors que l'émission fonctionne (voir ci-dessus) ; la réception passe peut-être seulement par le Bluetooth |
+| Messages texte, émission (USB) | **confirmée sur matériel (13/10/2026)** : « Test A vers appli » envoyé par USB, reçu par l'application officielle |
+| Réception de voix PTT par l'USB | **observée sur matériel** : la radio relaie les paquets `02 04 03 00 00` (5 trames AMR) à l'ordinateur ; décodage en son à vérifier |
+| Réception de messages texte par l'USB | **non vérifiée** (le seul essai à deux radios en USB a été fait avant l'ouverture de la session et sans recevoir de texte) |
 | Messages texte | **confirmé de bout en bout** |
 | Messages voix, image | implémenté, **non vérifié** |
 | PTT numérique | **confirmé** |
