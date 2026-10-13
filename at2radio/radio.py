@@ -444,6 +444,7 @@ class PttSession:
         self._pending: list[bytes] = []
         self._last = 0.0
         self._codec = None
+        self.key_acked: bool | None = None     # la radio a-t-elle acquitté la prise de porteuse ?
 
     async def __aenter__(self) -> "PttSession":
         from .protocole.amr import AmrNbCodec
@@ -453,7 +454,13 @@ class PttSession:
                 await self._t.send_payload(payload)
         else:
             await self._t.send_payload(ptt.build_offline_session_payload(True))
-        await self._t.send_payload(ptt.build_ptt_key_payload(True))
+        # Comme l'application officielle (setOfflineMode) : on attend l'accusé « 82 04 02 » pendant 450 ms.
+        ack = await self._t.request(
+            ptt.build_ptt_key_payload(True),
+            lambda p: p.type == 0x82 and p.group == 0x04 and p.body[:1] == b"\x02",
+            timeout=0.45,
+        )
+        self.key_acked = ack is not None
         await asyncio.sleep(0.02)
         return self
 

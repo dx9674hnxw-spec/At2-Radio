@@ -212,9 +212,11 @@ async def main(args) -> int:
             if pcm:
                 try:
                     async with radio.ptt_session() as ptt_session:
+                        log(f"  prise de porteuse acquittée par la radio : {'OUI' if ptt_session.key_acked else 'NON'}")
                         for i in range(0, len(pcm) - 319, 320):
                             await ptt_session.feed(pcm[i:i + 320])
-                    record("émission de voix (PTT)", None, f"{len(pcm) // 16000:.0f} s envoyées ; dis si B l'a entendue")
+                    record("émission de voix (PTT)", None, f"{len(pcm) // 16000:.0f} s envoyées, prise de porteuse acquittée : "
+                           f"{'oui' if ptt_session.key_acked else 'NON'} ; dis si B l'a entendue")
                 except Exception as exc:
                     record("émission de voix (PTT)", False, f"{type(exc).__name__}: {exc}")
 
