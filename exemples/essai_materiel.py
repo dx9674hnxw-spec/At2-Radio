@@ -60,6 +60,14 @@ async def main(args) -> int:
     radio.on("frame", lambda line: LOG.write(line + "\n"))
     radio.on("message", lambda m: log(f"  [reçu] {m.type} de {m.sender} : {m.text or m.lat or ''}"))
     radio.on("state", lambda s: log(f"  [état poussé par la radio] canal {s.current_channel}"))
+    voice = {"packets": 0, "pcm": bytearray()}
+
+    def on_voice(v):
+        voice["packets"] += 1
+        if v.pcm:
+            voice["pcm"] += v.pcm
+    radio.on("ptt_voice", on_voice)
+    radio.on("ptt_state", lambda st: log(f"  [voix] {'quelqu\'un parle' if st == 'rx' else 'silence'} ({voice['packets']} paquets reçus)"))
 
     log("== Connexion")
     try:
@@ -186,7 +194,18 @@ async def main(args) -> int:
             record("session de messagerie", False, str(exc))
         log(f"\n== Écoute pendant {args.ecoute} s (envoie un message depuis une autre radio)")
         await asyncio.sleep(args.ecoute)
-        record("écoute", None, "voir les lignes [reçu] ci-dessus")
+        if voice["packets"]:
+            detail = f"{voice['packets']} paquets de voix reçus (~{voice['packets'] * 0.1:.1f} s)"
+            if voice["pcm"]:
+                import wave
+                name = f"reception-{time.strftime('%Y%m%d-%H%M%S')}.wav"
+                with wave.open(name, "wb") as w:
+                    w.setnchannels(1); w.setsampwidth(2); w.setframerate(8000); w.writeframes(bytes(voice["pcm"]))
+                detail += f" ; son enregistré dans {name}"
+            else:
+                detail += " ; son non décodé (installe libopencore-amrnb0 pour l'enregistrer)"
+            record("réception de voix par l'USB", True, detail)
+        record("écoute", None, "voir les lignes [reçu] et [voix] ci-dessus")
 
     await radio.close_chat()
     await radio.disconnect()
