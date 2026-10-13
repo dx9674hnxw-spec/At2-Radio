@@ -118,6 +118,22 @@ async def main(args) -> int:
         else:
             record("écriture de canal", None)
 
+    if args.ecriture_vide:
+        n = args.ecriture_vide
+        cur = await step(f"Lecture du canal {n}", radio.read_channel(n))
+        if cur is not FAILED and (cur.rx_mhz is not None or cur.tx_mhz is not None):
+            record("écriture réelle", None, f"le canal {n} n'est pas vide ({cur.rx_mhz} MHz) : choisis un canal vide (--ecriture-vide)")
+        elif cur is not FAILED and confirm(f"Écrire une fréquence de TEST (446,10000 MHz, ton OFF) dans le canal VIDE {n}, la relire, puis le remettre vide ? "
+                                           "(modifie la radio, sans émettre)"):
+            from at2radio import ChannelConfig
+            test = ChannelConfig(channel=n, rx_mhz=446.1, tx_mhz=446.1)
+            res = await step(f"Écriture de test du canal {n}", radio.write_channel(test))
+            if res is not FAILED:
+                record(f"canal {n} : écriture réelle relue", res.verified, "; ".join(res.differences) or "446,1 MHz bien relu")
+            back = await step(f"Remise à vide du canal {n}", radio.write_channel(cur))
+            if back is not FAILED:
+                record(f"canal {n} : remis à vide", back.verified, "; ".join(back.differences) or "")
+
     if args.nom:
         if confirm(f"Changer le NOM de la radio en « {args.nom} » ? (commande corrigée, jamais testée ; "
                    "tu pourras remettre l'ancien nom depuis l'appli officielle)"):
@@ -125,11 +141,17 @@ async def main(args) -> int:
             record("nom de l'appareil (envoyé)", None, "à vérifier à l'écran ou dans l'appli officielle")
 
     if args.smart_link:
-        if confirm("Activer puis désactiver SMART LINK ? (commande corrigée, jamais testée)"):
-            await radio.set("smart_link", True)
-            await asyncio.sleep(0.5)
-            await radio.set("smart_link", False)
-            record("Smart Link (envoyé)", None, "à vérifier dans l'appli officielle")
+        if confirm("Inverser SMART LINK, le relire, puis le remettre comme avant ?"):
+            old = await step("Lecture de Smart Link", radio.get("smart_link"))
+            if old is not FAILED:
+                await radio.set("smart_link", not old)
+                await asyncio.sleep(0.5)
+                got = await step("Relecture de Smart Link", radio.get("smart_link"))
+                await radio.set("smart_link", old)
+                await asyncio.sleep(0.5)
+                back = await step("Remise de Smart Link", radio.get("smart_link"))
+                record("Smart Link : écriture puis relecture", got == (not old),
+                       f"avant {old}, après écriture {got}, remis à {back}")
 
     # --- 3. émission (option) -----------------------------------------------
     if args.texte:
@@ -170,7 +192,8 @@ if __name__ == "__main__":
     p.add_argument("--reglage", action="store_true", help="tester l'écriture du volume (+1 puis remis)")
     p.add_argument("--ecriture-canal", type=int, metavar="N", help="réécrire le canal N avec son contenu actuel, puis relire")
     p.add_argument("--nom", metavar="NOM", help="tester le changement de nom de l'appareil")
-    p.add_argument("--smart-link", action="store_true", help="tester Smart Link (activer puis désactiver)")
+    p.add_argument("--smart-link", action="store_true", help="tester Smart Link (inverser, relire, remettre)")
+    p.add_argument("--ecriture-vide", type=int, metavar="N", help="écrire une fréquence de test dans le canal VIDE N, la relire, puis le remettre vide")
     p.add_argument("--texte", metavar="TEXTE", help="ÉMET un message texte")
     p.add_argument("--position", metavar="LAT,LON", help="ÉMET une position")
     p.add_argument("--pseudo", default="TEST", help="pseudo affiché pour les messages émis")

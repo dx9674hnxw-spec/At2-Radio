@@ -73,7 +73,7 @@ SETTINGS: dict[str, Setting] = {s.name: s for s in [
     Setting("tx_interval_seconds", GROUP_RADIO, 0x0A, width=2, low=0, high=240, status=READ_BACK),
     Setting("dual_watch", GROUP_RADIO, 0x0D, is_bool=True, true_value=0x02, status=READ_BACK),
     Setting("noise_reduction", GROUP_RADIO, 0x11, is_bool=True, status=READ_BACK),
-    Setting("smart_link", GROUP_OFFLINE, 0x09, is_bool=True, status=NO_ANSWER),
+    Setting("smart_link", GROUP_OFFLINE, 0x09, is_bool=True, status=READ_BACK),   # requête 00 01 04 09 : réponse reçue sur matériel (USB)
 ]}
 
 # Cibles de l'appui long du bouton PTT principal (Smart Link), officiel seulement.
