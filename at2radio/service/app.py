@@ -259,6 +259,19 @@ def create_app(manager: RadioManager | None = None, api_key: str | None = None, 
             raise ValueError("indiquer channel ou focus=true")
         return {"side": side, "channel": channel, "focus": focus}
 
+    # -- messagerie : session hors réseau ----------------------------------
+    @app.post("/v1/radios/{radio_id}/chat/open", dependencies=secured)
+    async def chat_open(radio_id: str, disable_blocking_features: bool = False):
+        """Ouvre la session de messagerie (nécessaire pour envoyer et recevoir). Refusée si le Dual Watch
+        ou Smart Link est activé, sauf ``disable_blocking_features=true``."""
+        await radio_of(radio_id).open_chat(disable_blocking_features)
+        return {"chat_open": True}
+
+    @app.post("/v1/radios/{radio_id}/chat/close", dependencies=secured)
+    async def chat_close(radio_id: str):
+        await radio_of(radio_id).close_chat()
+        return {"chat_open": False}
+
     # -- messages --------------------------------------------------------
     def _log_out(radio_id, type_, sender, text=None, lat=None, lon=None, blob=None):
         if manager.history:

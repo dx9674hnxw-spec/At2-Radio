@@ -107,6 +107,7 @@ class Radio:
         self._amr = None
         self._amr_tried = False
         self._silence_handle: asyncio.TimerHandle | None = None
+        self._chat_open = False
 
     # -- événements ------------------------------------------------------
 
@@ -165,8 +166,10 @@ class Radio:
             await t.disconnect()
             self._emit("connection", "déconnectée")
         self.kind = self.target = None
+        self._chat_open = False
 
     def _on_lost(self) -> None:
+        self._chat_open = False
         self._emit("connection", "perdue")
 
     def _require(self) -> Transport:
@@ -333,6 +336,42 @@ class Radio:
 
     # -- messages --------------------------------------------------------
 
+    @property
+    def chat_open(self) -> bool:
+        return self._chat_open
+
+    async def open_chat(self, disable_blocking_features: bool = False) -> None:
+        """Ouvre la session de messagerie hors réseau (``CHAT SESSION ON`` de l'application officielle).
+
+        Nécessaire pour envoyer **et** pour recevoir des messages. L'application officielle
+        refuse de l'ouvrir tant que le **Dual Watch** ou **Smart Link** est activé ; ici, une erreur
+        explicite est levée, sauf si ``disable_blocking_features=True`` (ils sont alors désactivés,
+        sans être remis ensuite : voir ``close_chat``).
+        """
+        t = self._require()
+        if self._chat_open:
+            return
+        for name, label in (("dual_watch", "Dual Watch"), ("smart_link", "Smart Link")):
+            try:
+                enabled = await self.get(name)
+            except RadioTimeoutError:
+                continue                                      # la radio ne répond pas : on suppose désactivé
+            if enabled:
+                if not disable_blocking_features:
+                    raise RadioError(f"la messagerie hors réseau est impossible tant que {label} est activé "
+                                     f"(comportement de l'application officielle) : désactive-le, ou appelle "
+                                     f"open_chat(disable_blocking_features=True)")
+                await self.set(name, False)
+        await t.send_payload(ptt.build_offline_session_payload(True))
+        self._chat_open = True
+        await asyncio.sleep(0.3)
+
+    async def close_chat(self) -> None:
+        """Ferme la session de messagerie (``CHAT SESSION OFF``)."""
+        if self._chat_open and self.connected:
+            await self._transport.send_payload(ptt.build_offline_session_payload(False))
+        self._chat_open = False
+
     async def send_text(self, sender: str, text: str) -> None:
         await self._send_frames("text", messages.build_text_message_frames(sender, text, next(self._msg_ids)))
 
@@ -364,6 +403,7 @@ class Radio:
 
     async def _send_frames(self, kind: str, frames: list[bytes]) -> None:
         t = self._require()
+        await self.open_chat()
         first_delay, period = self.PACING[kind]
         async with self._send_lock:
             loop = asyncio.get_running_loop()

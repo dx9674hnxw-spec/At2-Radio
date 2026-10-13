@@ -117,6 +117,32 @@ async def main(a) -> int:
         return summary()
     record("canaux identiques", True)
 
+    # L'application officielle refuse d'ouvrir la messagerie si le Dual Watch ou Smart Link est activé.
+    restore: list[tuple[Radio, str]] = []
+    say("\n== Préparation de la messagerie hors réseau (comme l'application officielle)")
+    for name, radio in (("A", tx), ("B", rx)):
+        for setting, label in (("dual_watch", "Dual Watch"), ("smart_link", "Smart Link")):
+            try:
+                on = await radio.get(setting)
+            except RadioError:
+                continue
+            say(f"  radio {name} : {label} = {'ACTIVÉ' if on else 'désactivé'}")
+            if on:
+                if confirm(f"Désactiver {label} sur la radio {name} ? (l'appli officielle bloque la messagerie tant qu'il est activé ; "
+                           "il sera remis à la fin du test)"):
+                    await radio.set(setting, False)
+                    restore.append((radio, setting))
+                    await asyncio.sleep(0.5)
+                else:
+                    record(f"{label} sur {name}", None, "laissé activé : la messagerie risque de ne pas fonctionner")
+    try:
+        await tx.open_chat()
+        await rx.open_chat()
+        record("session de messagerie ouverte sur les deux radios", True)
+    except RadioError as exc:
+        record("session de messagerie", False, str(exc))
+        return summary()
+
     if a.selectionner and confirm(f"Mettre les deux radios sur le canal {a.canal} ? (commande de changement de canal, jamais testée)"):
         await tx.select_channel(a.canal)
         await rx.select_channel(a.canal)
@@ -140,6 +166,12 @@ async def main(a) -> int:
         await deliver(rx, tx, "texte B -> A", rx.send_text("BRAVO", "Retour At2-Radio"),
                       lambda m: m.type == "text" and m.text == "Retour At2-Radio")
 
+    say("\n== Remise en état")
+    for radio in (tx, rx):
+        await radio.close_chat()
+    for radio, setting in restore:
+        await radio.set(setting, True)
+        say(f"  radio {radio.id} : {setting} remis à ACTIVÉ")
     await tx.disconnect()
     await rx.disconnect()
     return summary()

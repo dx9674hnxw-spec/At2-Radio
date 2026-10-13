@@ -3,7 +3,7 @@ import asyncio
 
 import pytest
 
-from at2radio import DeliveryError, NotConnectedError, Radio, RadioTimeoutError
+from at2radio import DeliveryError, NotConnectedError, Radio, RadioError, RadioTimeoutError
 from at2radio.protocole import channel as chan
 from at2radio.protocole import messages, position
 from at2radio.protocole.frame import decode_packet, encode_frame, try_decode_frame
@@ -20,7 +20,7 @@ class FakeTransport(Transport):
         self.sent = []
         self.drop_acks = drop_acks
         self.mute = mute
-        self.settings = {(0x01, 0x01): 4, (0x02, 0x05): 120, (0x02, 0x0D): 2}
+        self.settings = {(0x01, 0x01): 4, (0x02, 0x05): 120, (0x02, 0x0D): 0, (0x04, 0x09): 0}
         self.channels = {1: CH1_BODY}
 
     async def connect(self, target, **kwargs):
@@ -79,7 +79,8 @@ def test_get_et_set():
         r, t = await connected()
         assert await r.get("volume") == 4
         assert await r.get("tot_seconds") == 120
-        assert await r.get("dual_watch") is True
+        assert await r.get("dual_watch") is False
+        assert await r.get("smart_link") is False
         await r.set("volume", 6)
         assert t.sent[-1].body == bytes([0x01, 6])
         with pytest.raises(ValueError):
@@ -92,7 +93,7 @@ def test_reglage_sans_reponse():
         r, t = await connected()
         r.QUERY_TIMEOUT = 0.05
         with pytest.raises(RadioTimeoutError):
-            await r.get("smart_link")
+            await r.get("squelch")
     run(go())
 
 
@@ -135,7 +136,7 @@ def test_envoi_de_texte_acquitte():
         r, t = await connected()
         r.PACING = {"text": (0, 0), "voice": (0, 0), "image": (0, 0)}
         await r.send_text("ALPHA", "a" * 300)          # fragmenté : début + 3 fragments
-        envoyes = [p for p in t.sent if p.type == 0x02 and p.group == 0x04]
+        envoyes = [p for p in t.sent if p.type == 0x02 and p.group == 0x04 and p.body[:1] == b"\x01"]
         assert len(envoyes) == 4
     run(go())
 
@@ -145,7 +146,7 @@ def test_envoi_perdu_puis_repris():
         r, t = await connected(drop_acks=1)
         r.ACK_TIMEOUT, r.ACK_BACKOFF = 0.05, 0
         await r.send_text("ALPHA", "Bonjour")
-        assert len([p for p in t.sent if p.group == 0x04]) == 2   # une répétition
+        assert len([p for p in t.sent if p.group == 0x04 and p.body[:1] == b"\x01"]) == 2   # une répétition
     run(go())
 
 
@@ -223,4 +224,38 @@ def test_perte_de_lien_signalee():
         r.on("connection", etats.append)
         t._lost()
         assert etats == ["perdue"] and not r.connected
+    run(go())
+
+
+def test_messagerie_refusee_si_dual_watch_actif():
+    async def go():
+        r, t = await connected()
+        r.PACING = {"text": (0, 0), "voice": (0, 0), "image": (0, 0)}
+        t.settings[(0x02, 0x0D)] = 2                      # Dual Watch activé
+        with pytest.raises(RadioError) as e:
+            await r.send_text("ALPHA", "Bonjour")
+        assert "Dual Watch" in str(e.value)
+        assert not any(p.body[:2] == bytes([0x07, 0x01]) for p in t.sent)     # la session n'a pas été ouverte
+    run(go())
+
+
+def test_open_chat_envoie_la_session_une_seule_fois_et_close_la_ferme():
+    async def go():
+        r, t = await connected()
+        r.PACING = {"text": (0, 0), "voice": (0, 0), "image": (0, 0)}
+        await r.send_text("ALPHA", "un")
+        await r.send_text("ALPHA", "deux")
+        sessions = [p for p in t.sent if p.type == 0x02 and p.group == 0x04 and p.body[:1] == b"\x07"]
+        assert len(sessions) == 1 and sessions[0].body == bytes([0x07, 0x01]) and r.chat_open
+        await r.close_chat()
+        assert t.sent[-1].body == bytes([0x07, 0x00]) and not r.chat_open
+    run(go())
+
+
+def test_open_chat_peut_desactiver_dual_watch():
+    async def go():
+        r, t = await connected()
+        t.settings[(0x02, 0x0D)] = 2
+        await r.open_chat(disable_blocking_features=True)
+        assert any(p.type == 0x02 and p.body == bytes([0x0D, 0x00]) for p in t.sent)
     run(go())

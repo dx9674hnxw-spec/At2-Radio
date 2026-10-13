@@ -115,6 +115,7 @@ Charge : `00 02 04 01 <type> <id BE32> 00 <expéditeur 16 octets> …` (`02 04` 
 - **Texte long** : message de début (`longueur du flux LE16, nombre de morceaux, 00`), puis des fragments de 131 octets : `00 02 04 01 02 <id> <n° BE16> 00 <données>`. Limite de l'application officielle : 1000 octets UTF-8.
 - **Voix** : trames AMR de 12 octets, fragments de 132 octets ; début : `longueur LE16, nombre de fragments LE16, durée en secondes LE16`. Durée officielle : 0,6 à 15 s.
 - **Image** : JPEG de 300 px au plus, qualité 75, fragments de 132 octets ; début : `longueur LE16, nombre de fragments, 00, largeur LE16, hauteur LE16` (dimensions de l'image d'origine après rotation).
+- **Session** : l'application officielle envoie `00 02 04 07 01` (« CHAT SESSION ON ») en entrant dans la messagerie, et `…07 00` en sortant. Elle **refuse** d'ouvrir la messagerie tant que le **Dual Watch** ou **Smart Link** est activé. *Hypothèse non vérifiée* : sans session ouverte et sans Dual Watch désactivé, la radio acquitte les trames sans les émettre (essai à deux radios du 13/10/2026 : accusés reçus, rien reçu par l'autre radio).
 - **Accusé** : `82 04 01 00` après chaque trame. L'émetteur attend l'accusé avant d'envoyer la suivante et renvoie en cas de perte.
 - **Réassemblage** : tampon par identifiant, expiration de 120 s, 64 messages en attente au plus.
 
