@@ -1,0 +1,7 @@
+At2-Radio
+
+Le protocole de la radio AT2 est issu de la rétro-ingénierie de l'application
+« AT2 HT » (https://github.com/byf3332/Baofeng-ALERVITES-AT2-Android, Apache-2.0)
+et de at2-bridge (MIT). Le codec AMR-NB utilise opencore-amr (Apache-2.0).
+Les licences et attributions complètes seront reprises de leurs THIRD_PARTY_NOTICES
+avant la première publication. Projet non affilié à Baofeng ni à Alervites.
