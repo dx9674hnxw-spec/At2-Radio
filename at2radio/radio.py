@@ -31,6 +31,7 @@ from .transports.base import Transport
 logger = logging.getLogger("at2radio")
 
 _PTT_SILENCE_SECONDS = 0.6
+PREFLIGHT_GAP_SECONDS = 0.12
 
 
 @dataclass
@@ -450,8 +451,12 @@ class PttSession:
         from .protocole.amr import AmrNbCodec
         self._codec = AmrNbCodec()
         if self._preflight:
+            # Une pause entre chaque commande : par l'USB, les écritures partent d'un coup et la radio
+            # perd des trames si on ne lui laisse pas le temps (l'appli officielle attend chaque écriture
+            # Bluetooth et, ailleurs, 120 ms entre deux requêtes).
             for payload in ptt.preflight_payloads():
                 await self._t.send_payload(payload)
+                await asyncio.sleep(PREFLIGHT_GAP_SECONDS)
         else:
             await self._t.send_payload(ptt.build_offline_session_payload(True))
         # Comme l'application officielle (setOfflineMode) : on attend l'accusé « 82 04 02 » pendant 450 ms.

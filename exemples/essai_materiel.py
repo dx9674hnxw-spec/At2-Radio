@@ -91,6 +91,14 @@ async def main(args) -> int:
         return summary()
     record("connexion", True, f"{radio.kind} {radio.target}")
 
+    if args.volume:
+        cur = await step("Lecture du volume", radio.get("volume"))
+        if cur is not FAILED and confirm(f"Mettre le VOLUME de la radio sur {args.volume} (actuellement {cur}) ? (reste ainsi après le test)"):
+            await radio.set("volume", args.volume)
+            await asyncio.sleep(0.5)
+            now = await step("Relecture du volume", radio.get("volume"))
+            record("volume", now == args.volume, f"maintenant {now}")
+
     if args.dual_watch:
         want = args.dual_watch == "on"
         cur = await step("Lecture du Dual Watch", radio.get("dual_watch"))
@@ -307,6 +315,7 @@ if __name__ == "__main__":
     p.add_argument("--ecoute-guidee", action="store_true", help="écoute en trois phases guidées (PTT physique, texte de l'appli, PTT de l'appli) avec un verdict par phase")
     p.add_argument("--ptt-test", action="store_true", help="ÉMET un son de test en voix (PTT), 2 secondes")
     p.add_argument("--ptt-wav", metavar="FICHIER", help="ÉMET un fichier son (mono, 16 bits, 8000 Hz) en voix (PTT), par exemple un reception-….wav")
+    p.add_argument("--volume", type=int, choices=range(1, 9), metavar="1-8", help="régler le volume de la radio (il reste ainsi)")
     p.add_argument("--dual-watch", choices=["on", "off"], help="mettre le Dual Watch sur on ou off (l'appli officielle bloque la messagerie s'il est activé)")
     p.add_argument("--pseudo", default="TEST", help="pseudo affiché pour les messages émis")
     p.add_argument("--ecoute", type=int, metavar="SECONDES", help="écouter les messages reçus")
