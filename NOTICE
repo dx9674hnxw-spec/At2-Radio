@@ -5,3 +5,7 @@ Le protocole de la radio AT2 est issu de la rétro-ingénierie de l'application
 et de at2-bridge (MIT). Le codec AMR-NB utilise opencore-amr (Apache-2.0).
 Les licences et attributions complètes seront reprises de leurs THIRD_PARTY_NOTICES
 avant la première publication. Projet non affilié à Baofeng ni à Alervites.
+
+Fichiers dérivés : at2radio/protocole/* et at2radio/transports/* reprennent le code
+de at2-bridge (MIT) et les formats de l'application officielle (Apache-2.0) ;
+at2radio/protocole/amr.py lie la bibliothèque libopencore-amrnb (Apache-2.0), non incluse.

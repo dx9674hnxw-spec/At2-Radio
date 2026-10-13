@@ -1,17 +1,17 @@
 {
-  "description": "Dialecte CPS : AA55, longueur sur 2 octets petit-boutiste, pas de 0x00 initial, CRC16 sur la charge, 77EE.",
-  "source": "captures matériel (2 vecteurs) ; at2-bridge",
+  "description": "Lecture et écriture d'un canal : même format de trame que le reste (type 0x11 lecture, 0x12 écriture, 0x91 réponse). L'ancien « dialecte CPS » est une trame classique de ce type.",
+  "source": "captures sur radio réelle (2 vecteurs)",
   "vecteurs": [
     {
       "nom": "lecture du canal 1 (capture matériel)",
-      "charge_hex": "110202000100",
+      "charge_hex": "00110202000100",
       "trame_hex": "aa550600110202000100d2d177ee",
       "source": "capture sur radio réelle, 27-28/08/2026"
     },
     {
       "nom": "réponse de lecture du canal 1 (capture matériel)",
       "trame_hex": "aa551b00910202010100945190029451900200000000000001000101000000d2c877ee",
-      "charge_hex": "910202010100945190029451900200000000000001000101000000",
+      "charge_hex": "00910202010100945190029451900200000000000001000101000000",
       "source": "capture sur radio réelle"
     }
   ]

@@ -6,8 +6,8 @@ Chaque fichier a `description`, `source` et une liste `vecteurs`. Les octets son
 | Fichier | Contenu |
 |---|---|
 | `crc16.json` | CRC-16/CCITT (poly 0x1021, init 0x1234) |
-| `trames_classiques.json` | charge ↔ trame complète, dialecte classique |
-| `trames_cps.json` | idem dialecte CPS, dont 2 **captures sur radio réelle** |
+| `trames_classiques.json` | charge ↔ trame complète |
+| `trames_canal.json` | lecture et écriture d'un canal (types `11` / `12` / `91`), dont 2 **captures sur radio réelle** |
 | `commandes.json` | réglages et requêtes, 30 charges. L'attendu est relu dans le code Kotlin de l'application officielle |
 | `canaux.json` | 3 lectures de canaux réelles décodées, trame d'écriture, tonalités, enregistrement de codeplug |
 | `messages.json` | messages texte / fragmenté / voix / image : trames et réassemblage attendu |

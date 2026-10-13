@@ -10,19 +10,16 @@ Brouillon de spécification, indépendant du langage. Sources : code Kotlin de l
 | BLE | Service `0000ae60-0000-1000-8000-00805f9b34fb`. Écriture : `0000ae10-…` (avec réponse). Notifications : `0000ae05-…` (descripteur `2902`). L'application officielle demande une MTU de 247 et la priorité de connexion haute. | officiel |
 | USB série | 115200 bauds, mêmes trames | `at2-bridge` seulement (non officiel) |
 
-## 2. Trames : deux dialectes
-Marqueurs communs : début `AA 55`, fin `77 EE`. CRC : CRC-16/CCITT non réfléchi, polynôme `0x1021`, valeur initiale `0x1234`, calculé **sur la charge sans le `00` initial** (dialecte classique) ou sur toute la charge (CPS), écrit en petit-boutiste.
+## 2. Trame : un seul format
+Début `AA 55`, fin `77 EE`. Une trame : `AA55 <long> 00 <type> <groupe> <sous-cmd> <corps> <crc16 LE> 77EE`.
 
-| | Classique | CPS |
-|---|---|---|
-| Usage | réglages, messages, PTT, nom | lecture / écriture d'un canal |
-| Longueur | 1 octet, nombre d'octets **après** le `00` initial | 2 octets LE, longueur de la charge |
-| Charge | commence par `00` | pas de `00` |
-| Trame | `AA55 LL 00 <type> <groupe> <sous-cmd> <corps> CRC(2) 77EE` | `AA55 LLLL <opcode> <groupe> <param> <corps> CRC(2) 77EE` |
+CRC : CRC-16/CCITT non réfléchi, polynôme `0x1021`, valeur initiale `0x1234`, calculé **sur la charge sans le `00` initial**, écrit en petit-boutiste. La longueur compte les octets qui suivent le `00` initial.
 
-Réception : une trame classique peut arriver sous deux variantes (avec ou sans le `00` stocké dans la longueur). L'application officielle teste les deux ; l'implémentation doit faire de même, puis resynchroniser sur le prochain `AA55` si la trame est incomplète ou corrompue. Les deux dialectes arrivent sur le même flux : la distinction (longueur sur 1 ou 2 octets) reste **à valider sur matériel**.
+**Il n'y a pas de second dialecte.** Les versions précédentes décrivaient un « dialecte CPS » (longueur sur 2 octets, pas de `00`) pour la lecture et l'écriture des canaux. Vérifié octet pour octet (`tests/test_trame_unique.py`) : une trame CPS est identique à une trame classique de type `0x11` (lecture), `0x12` (écriture) ou `0x91` (réponse), tant que la charge fait moins de 256 octets. Les deux octets de longueur n'en font qu'un suivi du `00` initial.
 
-Vecteurs : `trames_classiques.json`, `trames_cps.json`, `crc16.json`.
+Réception : l'application officielle accepte deux variantes de longueur (avec ou sans le `00` initial compté). L'implémentation fait de même, puis se resynchronise sur le prochain `AA 55` si une trame est incomplète ou corrompue.
+
+Vecteurs : `trames_classiques.json`, `trames_canal.json`, `crc16.json`.
 
 ## 3. Charge classique
 `00` `<type>` `<groupe>` `<sous-cmd>` `<corps>`
@@ -70,9 +67,9 @@ Vecteurs : `commandes.json`. Accusés relevés dans l'application officielle : S
 Réponses aux requêtes : `81 <groupe> <sous-cmd> <valeur>`. L'état courant du canal (`81 02 0E 01 <canal> …`) et du Dual Watch est aussi **poussé spontanément** par la radio.
 
 ## 5. Canaux (30 emplacements)
-### 5.1 Lecture d'un canal (dialecte CPS, confirmé sur matériel)
-Requête : charge `11 02 02 00 <canal LE16>`, par exemple `aa550600110202000100d2d177ee` pour le canal 1.
-Réponse : opcode `91`, groupe `02`, param `02`, puis un **corps de 24 octets** :
+### 5.1 Lecture d'un canal (confirmé sur matériel)
+Requête : type `11`, groupe `02`, sous-commande `02`, `00`, canal LE16 (charge `00 11 02 02 00 <canal>`), par exemple `aa550600110202000100d2d177ee` pour le canal 1.
+Réponse : type `91`, groupe `02`, sous-commande `02`, puis un **corps de 24 octets** :
 
 | Octets | Champ |
 |---|---|
@@ -91,11 +88,11 @@ Réponse : opcode `91`, groupe `02`, param `02`, puis un **corps de 24 octets** 
 | 22 | mode (`01` numérique, `00` analogique) |
 | 23 | clé de chiffrement (0 = aucune, 1 à 31) |
 
-Divergence connue : une première version du port supposait 25 octets. Corrigée sur 6 lectures réelles. Les vecteurs `canaux.json` donnent le corps de 24 octets.
+Le « corps de 25 octets » des anciennes versions comptait la sous-commande `02` : le corps réel fait 24 octets. Vecteurs : `canaux.json`.
 
 ### 5.2 Écriture
 Deux chemins existent ; **aucun n'est confirmé par relecture** :
-- **CPS** (`at2-bridge`) : `12 02 02 00` + 23 octets (canal LE16, RX, TX, six octets de tonalité, sept octets d'options, dans l'ordre de la table CPS officielle).
+- **Type `12`** (`at2-bridge`) : `00 12 02 02 00` + 23 octets (canal LE16, RX, TX, six octets de tonalité, sept octets d'options, dans l'ordre de la table CPS officielle).
 - **Classique** (application officielle) : `00 02 02 02` + enregistrement de 24 octets (marqueur `01`, canal, RX, TX, tonalités, options). Les 30 canaux = 720 octets, envoyés en morceaux de 168 octets.
 - Effacer un canal : enregistrement vide (RX = TX = 0, tonalités `7F`).
 
@@ -158,7 +155,7 @@ Les trois premières sont probablement la même erreur que celle déjà corrigé
 ## 9. Statut de chaque élément
 | Élément | Statut |
 |---|---|
-| Trames, CRC | testé (vecteurs) |
+| Trames, CRC | testé (vecteurs, 6 captures réelles) |
 | Lecture de canaux | **confirmé sur matériel** |
 | Écriture de canaux | acquittée, **non confirmée par relecture** |
 | Messages texte | **confirmé de bout en bout** |

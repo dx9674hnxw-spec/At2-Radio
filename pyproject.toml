@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "at2radio"
+version = "0.1.0.dev0"
+description = "Bibliothèque pour piloter la radio Baofeng / Alervites AT2 (projet communautaire, non affilié)."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+ble = ["bleak>=0.21"]
+serial = ["pyserial>=3.5"]
+test = ["pytest>=7"]
+
+[tool.setuptools.packages.find]
+include = ["at2radio*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
