@@ -95,7 +95,16 @@ async def main(a) -> int:
     record("connexion des deux radios", True, f"A={a.emetteur}  B={a.recepteur}")
 
     say(f"\n== Vérification : le canal {a.canal} est-il identique sur les deux radios ?")
-    ca, cb = await tx.read_channel(a.canal), await rx.read_channel(a.canal)
+    try:
+        ca = await tx.read_channel(a.canal)
+        cb = await rx.read_channel(a.canal)
+    except RadioError as exc:
+        record("lecture du canal", False, f"{exc}")
+        say("  Un autre programme utilise peut-être un de ces ports (le service de la page ? ModemManager ?).")
+        say("  Vérifie avec : sudo fuser -v /dev/ttyACM0 /dev/ttyACM1")
+        await tx.disconnect()
+        await rx.disconnect()
+        return summary()
     say(f"  A : {ca.rx_mhz} MHz, {'numérique' if ca.mode_digital else 'analogique'}, clé {ca.encrypt_key}")
     say(f"  B : {cb.rx_mhz} MHz, {'numérique' if cb.mode_digital else 'analogique'}, clé {cb.encrypt_key}")
     diffs = same_channel(ca, cb)
