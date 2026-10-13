@@ -1,0 +1,36 @@
+/* =====================================================================
+   Kit de design des apps maison (Argos, Maison…) : JETONS
+   Source : patrimoine/app/static/app.css. Ne pas modifier les valeurs :
+   une app ajoute ses compléments dans son propre fichier CSS.
+   Thème sombre uniquement, inspiré de Freebox OS Ultra / Tailwind gray-900.
+   ===================================================================== */
+:root{
+  color-scheme:dark;
+  /* surfaces */
+  --bg:#050505;            /* fond de page */
+  --card:#1a1a1a;          /* carte, dialogue */
+  --card-2:#151515;        /* bloc dans une carte, champ */
+  --card-3:#121212;        /* barre latérale */
+  --hover:#252525;
+  /* bordures */
+  --line:#1f2937;          /* carte, séparateur */
+  --line-soft:rgba(31,41,55,.5);
+  --line-2:#374151;        /* survol, champ, bouton secondaire */
+  /* textes */
+  --ink:#e5e7eb; --ink-2:#9ca3af; --ink-3:#6b7280; --ink-4:#4b5563;
+  /* sens */
+  --accent:#60a5fa; --accent-soft:rgba(59,130,246,.2); --accent-ink:#93c5fd;
+  --gain:#34d399; --gain-soft:rgba(16,185,129,.2);
+  --loss:#f87171; --loss-soft:rgba(239,68,68,.2);
+  --warn:#fbbf24; --warn-soft:rgba(245,158,11,.18);
+  /* palette des séries (graphiques, catégories), dans cet ordre */
+  --c1:#3b82f6; --c2:#10b981; --c3:#a855f7; --c4:#f97316; --c5:#06b6d4; --c6:#eab308; --c7:#4b5563;
+  /* échelle de niveaux : excellent -> mauvais, puis inconnu */
+  --lv0:#22c55e; --lv1:#a3e635; --lv2:#eab308; --lv3:#f97316; --lv4:#ef4444; --lv-off:#6b7280;
+  /* typographie : polices système, aucune police téléchargée */
+  --font:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --mono:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
+  /* géométrie */
+  --r-card:12px; --r-block:10px; --r-ctl:8px; --r-pill:9999px; --gap:16px;
+  --side:228px;            /* largeur de la barre latérale (68px en mode réduit) */
+}

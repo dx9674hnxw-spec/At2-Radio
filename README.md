@@ -4,7 +4,7 @@ Bibliothèque, service local et page de programmation pour la radio **Baofeng / 
 
 > **Projet communautaire, non affilié à Baofeng ni à Alervites.** Le protocole est issu de la rétro-ingénierie. Tout ce qui n'est pas confirmé sur matériel est marqué comme tel dans [`docs/PROTOCOLE.md`](docs/PROTOCOLE.md) §9.
 >
-> **État : développement.** La bibliothèque est écrite et testée sur un faux transport (103 tests) mais **n'a pas encore été essayée sur une vraie radio**. Le service HTTP et la page de programmation ne sont pas commencés.
+> **État : développement.** La bibliothèque, le service HTTP et la page de programmation sont écrits et testés sur un faux transport (119 tests), mais **rien n'a encore été essayé sur une vraie radio**. Voir [`exemples/essai_materiel.py`](exemples/essai_materiel.py).
 
 ## Premier message
 
@@ -29,6 +29,15 @@ cfg = await radio.read_channel(1)
 res = await radio.write_channel(cfg)      # relit et compare : res.verified, res.differences
 await radio.set("volume", 5)
 ```
+
+## Service local et page de programmation
+
+```bash
+pip install -e ".[ble,service]"
+python -m at2radio.service          # http://127.0.0.1:8765/  (documentation de l'API : /v1/docs)
+```
+
+La page de programmation (connexion, canaux, réglages, journal des trames) est servie sur `/`. Le service n'écoute que sur `127.0.0.1` par défaut. Une clé d'API est créée au premier lancement (`~/.config/at2radio/api-key`) ; elle est obligatoire dès que le service écoute ailleurs. Option `--history fichier.db` : historique des messages en SQLite.
 
 ## Tests
 

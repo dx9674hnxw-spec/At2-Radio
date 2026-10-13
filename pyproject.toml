@@ -13,10 +13,17 @@ dependencies = []
 [project.optional-dependencies]
 ble = ["bleak>=0.21"]
 serial = ["pyserial>=3.5"]
-test = ["pytest>=7"]
+service = ["fastapi>=0.110", "uvicorn[standard]>=0.27"]
+test = ["pytest>=7", "httpx>=0.27", "fastapi>=0.110", "uvicorn[standard]>=0.27"]
+
+[project.scripts]
+at2radio-service = "at2radio.service.__main__:main"
 
 [tool.setuptools.packages.find]
 include = ["at2radio*"]
+
+[tool.setuptools.package-data]
+"at2radio.service" = ["static/**/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

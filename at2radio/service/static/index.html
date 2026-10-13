@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050505">
+<title>At2-Radio · Programmation</title>
+<link rel="icon" type="image/svg+xml" href="/static/pwa/icon.svg">
+<link rel="stylesheet" href="/static/css/tokens.css">
+<link rel="stylesheet" href="/static/css/components.css">
+<link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="mob-bar">
+    <button type="button" class="side-ic" id="nav-open" aria-label="Ouvrir le menu"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+    <b id="mob-title">Radio</b><span></span>
+  </div>
+  <div class="nav-back" id="nav-back"></div>
+
+  <header class="top">
+    <div class="brand">
+      <span class="logo"><img src="/static/pwa/icon.svg" alt="" width="34" height="34"></span>
+      <div><b>At2-Radio</b><span>Programmation</span></div>
+    </div>
+    <nav class="tabs" aria-label="Navigation">
+      <button type="button" data-view="radio" title="Radio"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 19.1a10 10 0 0 1 0-14.2M7.8 16.2a6 6 0 0 1 0-8.4M16.2 7.8a6 6 0 0 1 0 8.4M19.1 4.9a10 10 0 0 1 0 14.2"/><circle cx="12" cy="12" r="2"/></svg><span class="nl">Radio</span></button>
+      <button type="button" data-view="channels" title="Canaux"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span class="nl">Canaux</span></button>
+      <button type="button" data-view="settings" title="Réglages"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg><span class="nl">Réglages</span></button>
+      <span class="nav-sp"></span>
+      <button type="button" data-view="diag" title="Diagnostic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17l6-6-6-6M12 19h8"/></svg><span class="nl">Diagnostic</span></button>
+    </nav>
+    <div class="sync" id="status-pill"><button type="button" class="side-ic" id="side-mini" title="Réduire le menu" aria-label="Réduire le menu"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><i id="status-dot"></i><span id="status-label">Non connectée</span></div>
+  </header>
+
+  <!-- ================= Radio ================= -->
+  <div class="grid view" id="v-radio" hidden>
+    <section class="panel s12">
+      <h2><span class="ico i-blue"><svg viewBox="0 0 24 24"><path d="M12 22v-5M9 8V2M15 8V2M18 8v5a6 6 0 0 1-12 0V8z"/></svg></span>Connexion <small id="conn-sub">—</small></h2>
+      <div class="row2">
+        <label>Nom de la radio dans le service<input id="radio-id" value="radio1" maxlength="40" autocomplete="off">
+          <span class="help">Lettres, chiffres, « - » et « _ ». Plusieurs radios peuvent être branchées en même temps, chacune avec son nom.</span></label>
+        <div>
+          <div class="lbl" style="margin-bottom:6px">Liaison</div>
+          <div class="seg" id="kind-seg"><button type="button" data-v="ble" aria-selected="true">Bluetooth</button><button type="button" data-v="serial" aria-selected="false">USB</button></div>
+        </div>
+      </div>
+      <div class="row2" style="margin-top:10px">
+        <label>Appareil<select id="target-select"><option value="">— cherche d'abord —</option></select></label>
+        <label>…ou adresse / port à la main<input id="target-manual" placeholder="AA:BB:CC:DD:EE:FF ou /dev/ttyUSB0" autocomplete="off"></label>
+      </div>
+      <div class="chips" style="margin-top:12px;gap:10px">
+        <button class="btn del" type="button" id="btn-scan">Chercher</button>
+        <button class="btn" type="button" id="btn-connect">Connecter</button>
+        <button class="btn del" type="button" id="btn-disconnect" hidden>Déconnecter</button>
+      </div>
+      <p class="help" id="scan-help" style="margin-top:10px">« Chercher » liste les radios Bluetooth à portée, ou les ports USB. Le service doit tourner sur la machine qui est à côté de la radio.</p>
+    </section>
+    <section class="panel s12">
+      <h2><span class="ico i-orange"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></span>À savoir</h2>
+      <div class="list">
+        <div><b>Écrire un canal ne garantit rien</b><span class="meta">La radio acquitte l'écriture sans confirmer qu'elle l'a prise. Après chaque écriture, la page relit le canal et te dit si le résultat correspond.</span></div>
+        <div><b>Projet communautaire</b><span class="meta">Non affilié à Baofeng ni à Alervites. Les réglages marqués « non vérifié » n'ont jamais été relus sur une vraie radio.</span></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ================= Canaux ================= -->
+  <div class="grid view" id="v-channels" hidden>
+    <div class="ann warning s12" role="note"><div><b>Avant d'écrire</b><p>Lis d'abord les 30 canaux et note-les : l'écriture remplace le contenu de la radio. Chaque écriture est relue pour vérification.</p></div></div>
+    <section class="panel s12">
+      <h2><span class="ico i-blue"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></span>Canaux <small id="ch-sub">pas encore lus</small></h2>
+      <div class="chips" style="gap:10px;margin-bottom:12px">
+        <button class="btn" type="button" id="btn-read-all">Lire les 30 canaux</button>
+        <button class="btn" type="button" id="btn-write-all">Écrire les 30 canaux</button>
+        <button class="btn del" type="button" id="btn-import">Importer un export XML</button>
+        <input type="file" id="xml-file" accept=".xml" hidden>
+        <span class="help" id="ch-result"></span>
+      </div>
+      <div class="tbl"><table id="ch-table"><thead><tr>
+        <th>Canal</th><th>RX MHz</th><th>TX MHz</th><th>Ton RX</th><th>Ton TX</th>
+        <th title="Bande étroite">Étroite</th><th title="Puissance haute">Haute</th><th>Scan</th><th>Num.</th><th title="Busy lock">Busy</th><th title="Saut de fréquence">Saut</th><th>Clé</th><th><span class="sr">Actions</span></th>
+      </tr></thead><tbody id="ch-body"></tbody></table></div>
+    </section>
+  </div>
+
+  <!-- ================= Réglages ================= -->
+  <div class="grid view" id="v-settings" hidden>
+    <section class="panel s12">
+      <h2><span class="ico i-purple"><svg viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg></span>Réglages de la radio <small id="set-sub">pas encore lus</small></h2>
+      <div class="chips" style="gap:10px;margin-bottom:14px">
+        <button class="btn del" type="button" id="btn-read-settings">Relire les réglages</button>
+        <button class="btn" type="button" id="btn-apply-settings" disabled>Appliquer les changements</button>
+        <span class="tag warn" id="dirty-tag" hidden>modifications non appliquées</span>
+      </div>
+      <div class="settings-cols" id="settings-root"></div>
+    </section>
+  </div>
+
+  <!-- ================= Diagnostic ================= -->
+  <div class="grid view" id="v-diag" hidden>
+    <section class="panel s12">
+      <h2><span class="ico i-cyan"><svg viewBox="0 0 24 24"><path d="M4 17l6-6-6-6M12 19h8"/></svg></span>Journal des trames <small id="diag-sub">—</small></h2>
+      <div class="chips" style="gap:10px;margin-bottom:10px">
+        <input type="search" id="diag-filter" placeholder="Filtrer…" style="flex:1;min-width:180px">
+        <button class="btn del" type="button" id="btn-diag-copy">Copier</button>
+        <button class="btn del" type="button" id="btn-diag-export">Exporter (.txt)</button>
+        <button class="btn del" type="button" id="btn-diag-clear">Vider</button>
+      </div>
+      <pre id="diag-log" class="diag" aria-live="polite"></pre>
+      <p class="help">TX = envoyé à la radio, RX = reçu. Les octets sont en hexadécimal. Le journal ne contient ni mot de passe ni clé d'API.</p>
+    </section>
+  </div>
+</div>
+
+<dialog class="dlg" id="dlg-key" aria-labelledby="dlg-key-t"><form method="dialog" id="key-form">
+  <h2 id="dlg-key-t">Clé d'API</h2>
+  <p class="help" style="margin:0">Le service demande une clé. Elle est affichée au premier lancement, et enregistrée dans <code>~/.config/at2radio/api-key</code>. Elle reste dans cet onglet seulement.</p>
+  <label>Clé<input type="password" id="key-input" autocomplete="off" required></label>
+  <div class="dlg-actions"><button class="btn" type="submit">Valider</button></div>
+</form></dialog>
+
+<script src="/static/js/base.js"></script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

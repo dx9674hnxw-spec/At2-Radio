@@ -1,0 +1,55 @@
+/* At2-Radio : compléments de la page de programmation. Ne réutilise que les variables du kit. */
+.brand .logo img{display:block;width:34px;height:34px;border-radius:9px}
+.logo{filter:none!important}
+.sync{flex-wrap:nowrap}
+.sync #status-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#status-dot{width:7px;height:7px;border-radius:50%;background:var(--ink-4);flex:none;order:-1}
+#status-pill.up #status-dot{background:var(--gain)}
+#status-pill.lost #status-dot{background:var(--warn)}
+body.side-mini .sync{flex-direction:column;gap:6px}
+.view:not([hidden]){align-content:start}
+.help{display:block}
+label .help{margin-top:2px}
+code{font:12px var(--mono);color:var(--ink-2)}
+
+/* Canaux */
+#ch-table{min-width:1000px}
+#ch-table input[type=text],#ch-table input:not([type]),#ch-table input[type=number],#ch-table select{padding:5px 6px;font-size:12.5px;width:100%;min-width:0}
+#ch-table input.mhz{font-family:var(--mono);width:112px}
+#ch-table select{width:104px}
+#ch-table input.key{width:54px}
+#ch-table td{padding:6px 5px}
+#ch-table td.c{text-align:center}
+#ch-table th{white-space:nowrap}
+#ch-table tr.dirty td{background:rgba(59,130,246,.07)}
+#ch-table tr.bad td{background:var(--warn-soft)}
+.num-ch{font-family:var(--mono);color:var(--ink-2)}
+.empty-row{opacity:.55}
+
+/* Réglages */
+.settings-cols{display:grid;grid-template-columns:1fr 1fr;gap:0 40px}
+@container main (max-width:760px){.settings-cols{grid-template-columns:1fr}}
+.sgroup{margin-bottom:22px}
+.sgroup h3{margin:0 0 4px;font-size:12px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.srow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid var(--line-soft)}
+.srow:last-child{border-bottom:0}
+.srow .lab{flex:1;min-width:0;font-size:13px;color:var(--ink)}
+.srow .lab small{display:block;color:var(--ink-3);font-size:11.5px;margin-top:2px}
+.srow .ctl{display:flex;align-items:center;gap:10px;flex:none}
+.srow input[type=range]{width:130px;accent-color:#3b82f6;padding:0}
+.srow input[type=text],.srow input[type=number],.srow select{width:150px}
+.srow .val{font-family:var(--mono);min-width:2.8em;text-align:right;color:var(--ink-2);font-size:12.5px}
+.srow.dirty .lab{color:var(--accent-ink)}
+/* interrupteur */
+.sw{position:relative;display:inline-block;width:36px;height:20px;flex:none}
+.sw input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer;width:100%;height:100%}
+.sw i{position:absolute;inset:0;border-radius:var(--r-pill);background:var(--line-2);transition:background .15s;pointer-events:none}
+.sw i::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .15s}
+.sw input:checked + i{background:#3b82f6}
+.sw input:checked + i::after{transform:translateX(16px)}
+.sw input:focus-visible + i{outline:2px solid var(--accent)}
+
+/* Diagnostic */
+.diag{background:var(--card-2);border:1px solid var(--line);border-radius:var(--r-block);padding:12px;margin:0;font:11.5px/1.5 var(--mono);color:var(--ink);height:420px;overflow:auto;white-space:pre-wrap;word-break:break-all}
+.diag .tx{color:var(--accent-ink)}
+.diag .rx{color:var(--gain)}
