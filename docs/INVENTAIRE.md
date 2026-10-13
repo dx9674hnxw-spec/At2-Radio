@@ -3,7 +3,7 @@
 Comparaison entre l'application officielle **AT2 HT** (`byf3332/Baofeng-ALERVITES-AT2-Android`, commit `d91f50f`, Apache-2.0) et l'implémentation actuelle `at2-bridge` (Python).
 
 Méthode : lecture du code Kotlin de l'application (`At2Commands`, `At2ProtocolExecutor`, `At2RxState`, `BleEventController`, `PttVoiceSender/Receiver`, `LocationShareController`, `BleSession`, `DeviceConnectionController`, README) et recherche des équivalents dans `at2-bridge`.
-Limite : lecture statique uniquement. Rien n'a été exécuté, ni sur matériel, ni en test. Les écarts ci-dessous sont des **écarts de code**, pas des défauts prouvés sur radio.
+Mise à jour du 13/10/2026 : les essais sur radio réelle (USB) confirment la correction de Smart Link ; voir `PROTOCOLE.md` §9. Limite : lecture statique uniquement pour le reste. Rien n'a été exécuté, ni sur matériel, ni en test. Les écarts ci-dessous sont des **écarts de code**, pas des défauts prouvés sur radio.
 
 ## 1. Ce qu'on retrouve des deux côtés (déjà porté)
 

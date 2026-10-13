@@ -150,14 +150,14 @@ Vecteurs : `ptt.json`.
 | Position / SOS | séparateurs `*-#-*…` | `📍 lat,lon` |
 | Amorçage PTT | 6 requêtes | session seulement |
 
-Les trois premières sont probablement la même erreur que celle déjà corrigée pour le changement de canal (type omis). Aucune n'a été testée sur radio.
+Les trois premières étaient la même erreur que celle déjà corrigée pour le changement de canal (type omis). **Smart Link (écriture et requête) est confirmé corrigé sur matériel** ; le nom reste à confirmer.
 
 ## 9. Statut de chaque élément
 | Élément | Statut |
 |---|---|
 | Trames, CRC | testé (vecteurs, 6 captures réelles) |
 | Lecture de canaux | **confirmé sur matériel** |
-| Écriture de canaux | **relue et identique sur matériel (USB, canal 5)** ; écriture d'un contenu différent à confirmer |
+| Écriture de canaux | **confirmée sur matériel (USB)** : canal 19 vide, écriture de 446,1 MHz relue à l'identique, puis remis à vide ; canal 5 réécrit à l'identique |
 | Lecture de 30 canaux, 12 réglages | **confirmé sur matériel (USB)**, 30/30 canaux et 12/12 réglages |
 | Messages texte | **confirmé de bout en bout** |
 | Messages voix, image | implémenté, **non vérifié** |
@@ -166,6 +166,7 @@ Les trois premières sont probablement la même erreur que celle déjà corrigé
 | Volume, squelch, TOT, VOX, TX, bruit, tonalité, langue | acquitté seulement |
 | Dual Watch, intervalle TX | porté de l'officiel, jamais relu |
 | Smart Link, requête | **confirmé sur matériel (USB)** : la requête officielle `00 01 04 09` reçoit une réponse (l'ancienne forme du pont n'en recevait pas) |
-| Smart Link, écriture ; nom de l'appareil | commande officielle, envoyée sur matériel, effet **à confirmer** |
+| Smart Link, écriture | **confirmé sur matériel (USB)** : `00 02 04 09 01` bascule l'état, relu `True` puis remis |
+| Nom de l'appareil | commande officielle `00 02 03 01 <nom>`, envoyée sur matériel, effet **à confirmer** (non relisable) |
 | Bouton PTT principal | officiel, non porté |
 | Position / SOS | convention ; format officiel à adopter |
