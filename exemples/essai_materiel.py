@@ -196,6 +196,28 @@ async def main(args) -> int:
             ok = await step("Envoi de la position", radio.send_position(args.pseudo, lat, lon))
             record("envoi de position (accusé reçu)", ok is not FAILED, "vérifier qu'elle s'affiche dans l'appli officielle d'une 2e radio")
 
+    if args.ptt_test or args.ptt_wav:
+        what = f"le fichier {args.ptt_wav}" if args.ptt_wav else "un son de test (440 Hz, 2 secondes)"
+        if confirm(f"ÉMETTRE EN VOIX (PTT) {what} ? (transmission réelle ; écoute la radio B : tu dois l'entendre)"):
+            import math, struct, wave
+            if args.ptt_wav:
+                with wave.open(args.ptt_wav, "rb") as w:
+                    ok = (w.getnchannels(), w.getsampwidth(), w.getframerate()) == (1, 2, 8000)
+                    pcm = w.readframes(w.getnframes()) if ok else b""
+                if not ok:
+                    record("PTT", False, "le fichier doit être en mono, 16 bits, 8000 Hz")
+                    pcm = b""
+            else:
+                pcm = b"".join(struct.pack("<h", int(6000 * math.sin(2 * math.pi * 440 * i / 8000))) for i in range(16000))
+            if pcm:
+                try:
+                    async with radio.ptt_session() as ptt_session:
+                        for i in range(0, len(pcm) - 319, 320):
+                            await ptt_session.feed(pcm[i:i + 320])
+                    record("émission de voix (PTT)", None, f"{len(pcm) // 16000:.0f} s envoyées ; dis si B l'a entendue")
+                except Exception as exc:
+                    record("émission de voix (PTT)", False, f"{type(exc).__name__}: {exc}")
+
     if args.ecoute_guidee:
         log("\n== Ouverture de la messagerie (Dual Watch et Smart Link doivent être désactivés)")
         try:
@@ -281,6 +303,8 @@ if __name__ == "__main__":
     p.add_argument("--texte", metavar="TEXTE", help="ÉMET un message texte")
     p.add_argument("--position", metavar="LAT,LON", help="ÉMET une position")
     p.add_argument("--ecoute-guidee", action="store_true", help="écoute en trois phases guidées (PTT physique, texte de l'appli, PTT de l'appli) avec un verdict par phase")
+    p.add_argument("--ptt-test", action="store_true", help="ÉMET un son de test en voix (PTT), 2 secondes")
+    p.add_argument("--ptt-wav", metavar="FICHIER", help="ÉMET un fichier son (mono, 16 bits, 8000 Hz) en voix (PTT), par exemple un reception-….wav")
     p.add_argument("--dual-watch", choices=["on", "off"], help="mettre le Dual Watch sur on ou off (l'appli officielle bloque la messagerie s'il est activé)")
     p.add_argument("--pseudo", default="TEST", help="pseudo affiché pour les messages émis")
     p.add_argument("--ecoute", type=int, metavar="SECONDES", help="écouter les messages reçus")

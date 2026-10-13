@@ -164,7 +164,7 @@ Les trois premières étaient la même erreur que celle déjà corrigée pour le
 | Position, émission (USB) | **confirmée sur matériel (13/10/2026)** : envoyée depuis le serveur par USB, reçue et affichée comme une localisation par l'application officielle (radio B en Bluetooth). Conditions de l'essai : Dual Watch désactivé, session de messagerie ouverte (`04 07 01`) |
 | Messages texte, émission (USB) | **confirmée sur matériel (13/10/2026)** : « Test A vers appli » envoyé par USB, reçu par l'application officielle |
 | Réception de voix PTT par l'USB | **confirmée sur matériel (13/10/2026)** : 77 paquets (PTT physique de l'autre radio) et 93 paquets (PTT de l'appli officielle) `02 04 03 00 00` + 5 trames AMR de 12 octets ; le décodage en son (fichier WAV) reste à valider à l'écoute |
-| Réception de messages texte par l'USB | **aucune trame reçue** lors d'un essai guidé (session ouverte, Dual Watch désactivé) alors que la voix remontait ; à refaire pour exclure une erreur de manipulation |
+| Réception de messages texte par l'USB | **non observée** : deux essais (guidé, puis libre), textes envoyés depuis l'appli officielle, session ouverte et Dual Watch désactivé : aucune trame texte, alors que la voix remontait. Le texte reçu passe probablement seulement par le Bluetooth |
 | Messages texte | **confirmé de bout en bout** |
 | Messages voix, image | implémenté, **non vérifié** |
 | PTT numérique | **confirmé** |
