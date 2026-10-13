@@ -59,8 +59,14 @@ async def main(args) -> int:
     radio = Radio("essai")
     rx_kinds: dict[str, int] = {}
 
+    listening = {"on": False}
+
     def on_frame(line):
         LOG.write(line + "\n")
+        # Pendant l'écoute : toute trame reçue qui n'est pas de la voix est affichée en direct,
+        # y compris celles que le décodeur rejette (elles ne figurent sinon que dans le fichier log).
+        if listening["on"] and line.startswith("RX ") and not line.startswith("RX aa5541000204030000"):
+            print(f"  [trame brute reçue] {line[3:]}")
         if line.startswith("RX "):
             try:
                 b = bytes.fromhex(line[3:])
@@ -229,6 +235,7 @@ async def main(args) -> int:
                     record("émission de voix (PTT)", False, f"{type(exc).__name__}: {exc}")
 
     if args.ecoute_guidee:
+        listening["on"] = True
         log("\n== Ouverture de la messagerie (Dual Watch et Smart Link doivent être désactivés)")
         try:
             await radio.open_chat()
@@ -265,6 +272,7 @@ async def main(args) -> int:
             record("son enregistré", True, name)
 
     if args.ecoute:
+        listening["on"] = True
         log("\n== Ouverture de la messagerie (nécessaire pour recevoir ; le Dual Watch et Smart Link doivent être désactivés)")
         try:
             await radio.open_chat()
