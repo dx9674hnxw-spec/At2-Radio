@@ -57,7 +57,18 @@ async def main(args) -> int:
     global LOG
     LOG = open(f"essai-{time.strftime('%Y%m%d-%H%M%S')}.log", "w", encoding="utf-8")
     radio = Radio("essai")
-    radio.on("frame", lambda line: LOG.write(line + "\n"))
+    rx_kinds: dict[str, int] = {}
+
+    def on_frame(line):
+        LOG.write(line + "\n")
+        if line.startswith("RX "):
+            try:
+                b = bytes.fromhex(line[3:])
+                key = f"type {b[4]:02x} groupe {b[5]:02x} sous-commande {b[6]:02x}"
+                rx_kinds[key] = rx_kinds.get(key, 0) + 1
+            except (ValueError, IndexError):
+                pass
+    radio.on("frame", on_frame)
     radio.on("message", lambda m: log(f"  [reçu] {m.type} de {m.sender} : {m.text or m.lat or ''}"))
     radio.on("state", lambda s: log(f"  [état poussé par la radio] canal {s.current_channel}"))
     voice = {"packets": 0, "pcm": bytearray()}
@@ -185,6 +196,42 @@ async def main(args) -> int:
             ok = await step("Envoi de la position", radio.send_position(args.pseudo, lat, lon))
             record("envoi de position (accusé reçu)", ok is not FAILED, "vérifier qu'elle s'affiche dans l'appli officielle d'une 2e radio")
 
+    if args.ecoute_guidee:
+        log("\n== Ouverture de la messagerie (Dual Watch et Smart Link doivent être désactivés)")
+        try:
+            await radio.open_chat()
+            record("session de messagerie ouverte", True)
+        except RadioError as exc:
+            record("session de messagerie", False, str(exc))
+        got_msgs: list = []
+        radio.on("message", got_msgs.append)
+
+        async def phase(titre: str, consigne: str, secondes: int) -> tuple[int, int, dict]:
+            rx_kinds.clear()
+            v0, m0 = voice["packets"], len(got_msgs)
+            log(f"\n######## {titre} ########\n>>> {consigne}\n    (tu as {secondes} secondes ; ne touche à rien d'autre)")
+            await asyncio.sleep(secondes)
+            return voice["packets"] - v0, len(got_msgs) - m0, dict(rx_kinds)
+
+        v, m, kinds = await phase("PHASE 1 : VOIX avec le bouton PTT PHYSIQUE de la radio B",
+                                  "MAINTENANT : maintiens le bouton PTT de la radio B et dis « test un deux trois » pendant 4 secondes, puis relâche.", 25)
+        log(f"  Phase 1 : {v} paquets de voix, {m} messages, trames reçues par type : {kinds or 'aucune'}")
+        record("phase 1 : voix (PTT physique de B)", v > 0, f"{v} paquets de voix reçus par l'USB")
+        v, m, kinds = await phase("PHASE 2 : TEXTE depuis l'APPLI OFFICIELLE (radio B)",
+                                  "MAINTENANT : envoie le message « Bonjour depuis l'appli » depuis l'appli officielle.", 40)
+        log(f"  Phase 2 : {v} paquets de voix, {m} messages, trames reçues par type : {kinds or 'aucune'}")
+        record("phase 2 : texte (appli officielle)", m > 0, f"{m} message(s) décodé(s) ; trames reçues : {kinds or 'aucune'}")
+        v, m, kinds = await phase("PHASE 3 : VOIX depuis l'APPLI OFFICIELLE (radio B)",
+                                  "MAINTENANT : dans l'appli officielle, maintiens le bouton PTT et dis « test un deux trois » pendant 4 secondes.", 30)
+        log(f"  Phase 3 : {v} paquets de voix, {m} messages, trames reçues par type : {kinds or 'aucune'}")
+        record("phase 3 : voix (appli officielle)", v > 0, f"{v} paquets de voix reçus par l'USB")
+        if voice["pcm"]:
+            import wave
+            name = f"reception-{time.strftime('%Y%m%d-%H%M%S')}.wav"
+            with wave.open(name, "wb") as w:
+                w.setnchannels(1); w.setsampwidth(2); w.setframerate(8000); w.writeframes(bytes(voice["pcm"]))
+            record("son enregistré", True, name)
+
     if args.ecoute:
         log("\n== Ouverture de la messagerie (nécessaire pour recevoir ; le Dual Watch et Smart Link doivent être désactivés)")
         try:
@@ -233,6 +280,7 @@ if __name__ == "__main__":
     p.add_argument("--ecriture-vide", type=int, metavar="N", help="écrire une fréquence de test dans le canal VIDE N, la relire, puis le remettre vide")
     p.add_argument("--texte", metavar="TEXTE", help="ÉMET un message texte")
     p.add_argument("--position", metavar="LAT,LON", help="ÉMET une position")
+    p.add_argument("--ecoute-guidee", action="store_true", help="écoute en trois phases guidées (PTT physique, texte de l'appli, PTT de l'appli) avec un verdict par phase")
     p.add_argument("--dual-watch", choices=["on", "off"], help="mettre le Dual Watch sur on ou off (l'appli officielle bloque la messagerie s'il est activé)")
     p.add_argument("--pseudo", default="TEST", help="pseudo affiché pour les messages émis")
     p.add_argument("--ecoute", type=int, metavar="SECONDES", help="écouter les messages reçus")
