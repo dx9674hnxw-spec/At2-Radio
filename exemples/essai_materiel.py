@@ -84,7 +84,10 @@ async def main(args) -> int:
         if v.pcm:
             voice["pcm"] += v.pcm
     radio.on("ptt_voice", on_voice)
-    radio.on("ptt_state", lambda st: log(f"  [voix] {'quelqu\'un parle' if st == 'rx' else 'silence'} ({voice['packets']} paquets reçus)"))
+    def on_ptt_state(st):
+        quoi = "quelqu'un parle" if st == "rx" else "silence"
+        log(f"  [voix] {quoi} ({voice['packets']} paquets reçus)")
+    radio.on("ptt_state", on_ptt_state)
 
     log("== Connexion")
     try:
