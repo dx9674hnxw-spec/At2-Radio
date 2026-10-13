@@ -72,6 +72,17 @@ async def main(args) -> int:
         return summary()
     record("connexion", True, f"{radio.kind} {radio.target}")
 
+    if args.dual_watch:
+        want = args.dual_watch == "on"
+        cur = await step("Lecture du Dual Watch", radio.get("dual_watch"))
+        if cur is not FAILED and cur != want and confirm(f"Mettre le Dual Watch sur {args.dual_watch.upper()} ? (modifie la radio ; il reste ainsi après le test)"):
+            await radio.set("dual_watch", want)
+            await asyncio.sleep(0.5)
+            now = await step("Relecture du Dual Watch", radio.get("dual_watch"))
+            record("Dual Watch", now == want, f"maintenant {'activé' if now else 'désactivé'}")
+        elif cur == want:
+            record("Dual Watch", True, "déjà dans cet état")
+
     # --- 1. lecture seule -------------------------------------------------
     cfg = await step("Lecture du canal 1", radio.read_channel(1))
     if cfg is not FAILED:
@@ -171,6 +182,7 @@ async def main(args) -> int:
         await asyncio.sleep(args.ecoute)
         record("écoute", None, "voir les lignes [reçu] ci-dessus")
 
+    await radio.close_chat()
     await radio.disconnect()
     return summary()
 
@@ -196,6 +208,7 @@ if __name__ == "__main__":
     p.add_argument("--ecriture-vide", type=int, metavar="N", help="écrire une fréquence de test dans le canal VIDE N, la relire, puis le remettre vide")
     p.add_argument("--texte", metavar="TEXTE", help="ÉMET un message texte")
     p.add_argument("--position", metavar="LAT,LON", help="ÉMET une position")
+    p.add_argument("--dual-watch", choices=["on", "off"], help="mettre le Dual Watch sur on ou off (l'appli officielle bloque la messagerie s'il est activé)")
     p.add_argument("--pseudo", default="TEST", help="pseudo affiché pour les messages émis")
     p.add_argument("--ecoute", type=int, metavar="SECONDES", help="écouter les messages reçus")
     sys.exit(asyncio.run(main(p.parse_args())))
