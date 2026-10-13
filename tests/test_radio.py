@@ -42,6 +42,8 @@ class FakeTransport(Transport):
         if t == 0x01 and b and (g, b[0]) in self.settings:
             width = 2 if (g, b[0]) == (0x02, 0x05) else 1
             self.push(0x81, g, bytes([b[0]]) + self.settings[(g, b[0])].to_bytes(width, "little"))
+        elif t == 0x02 and b and (g, b[0]) in self.settings and len(b) >= 2:    # écriture d'un réglage : la radio la prend
+            self.settings[(g, b[0])] = int.from_bytes(b[1:], "little")
         elif t == 0x11:
             ch = int.from_bytes(b[2:4], "little")
             if ch in self.channels:
