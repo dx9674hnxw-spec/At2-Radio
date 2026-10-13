@@ -178,6 +178,12 @@ async def main(args) -> int:
             record("envoi de position (accusé reçu)", ok is not FAILED, "vérifier qu'elle s'affiche dans l'appli officielle d'une 2e radio")
 
     if args.ecoute:
+        log("\n== Ouverture de la messagerie (nécessaire pour recevoir ; le Dual Watch et Smart Link doivent être désactivés)")
+        try:
+            await radio.open_chat()
+            record("session de messagerie ouverte", True)
+        except RadioError as exc:
+            record("session de messagerie", False, str(exc))
         log(f"\n== Écoute pendant {args.ecoute} s (envoie un message depuis une autre radio)")
         await asyncio.sleep(args.ecoute)
         record("écoute", None, "voir les lignes [reçu] ci-dessus")
