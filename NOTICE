@@ -1,4 +1,6 @@
 At2-Radio
+Copyright 2026 les contributeurs d'At2-Radio
+Sous licence Apache-2.0 (voir LICENSE).
 
 Le protocole de la radio AT2 est issu de la rétro-ingénierie de l'application
 « AT2 HT » (https://github.com/byf3332/Baofeng-ALERVITES-AT2-Android, Apache-2.0)
@@ -9,3 +11,9 @@ avant la première publication. Projet non affilié à Baofeng ni à Alervites.
 Fichiers dérivés : at2radio/protocole/* et at2radio/transports/* reprennent le code
 de at2-bridge (MIT) et les formats de l'application officielle (Apache-2.0) ;
 at2radio/protocole/amr.py lie la bibliothèque libopencore-amrnb (Apache-2.0), non incluse.
+
+Brevets : la norme AMR (codec AMR-NB utilisé pour la voix) peut être couverte par des brevets ;
+chacun doit évaluer ses obligations dans sa juridiction. La bibliothèque libopencore-amrnb n'est
+pas incluse et reste sous sa propre licence.
+Modifications : ce projet adapte du code d'AT2 HT (Apache-2.0) et de at2-bridge (MIT) ;
+les fichiers concernés sont indiqués dans leurs en-têtes.

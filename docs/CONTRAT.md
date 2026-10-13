@@ -187,7 +187,7 @@ Aide : une phrase sous chaque réglage non évident. Aucun terme technique brut 
 
 ## 8. Licence, provenance, sécurité
 
-- Le protocole provient de la rétro-ingénierie de l'application Android `Baofeng-ALERVITES-AT2-Android` (Apache-2.0) : conserver `NOTICE` et les attributions. Le codec AMR (opencore-amr) est un composant tiers : conserver sa licence. **Choix de licence du nouveau dépôt à valider** (MIT actuel pour le code ; compatibilité à vérifier).
+- Le protocole provient de la rétro-ingénierie de l'application Android `Baofeng-ALERVITES-AT2-Android` (Apache-2.0) : conserver `NOTICE` et les attributions. Le codec AMR (opencore-amr) est un composant tiers : conserver sa licence. **Licence retenue : Apache-2.0** (le code repris d'AT2 HT est sous Apache-2.0 ; celui de at2-bridge, sous MIT, s'y combine). Modifiable tant que le dépôt est privé.
 - Mention claire : **projet communautaire, non affilié à Baofeng/Alervites**.
 - Le service écoute en local par défaut, ne journalise ni secret ni donnée personnelle, et n'émet jamais sans demande explicite.
 - **Hors réseau :** aucun CDN, aucune police externe ; si une carte est un jour ajoutée, tuiles servies localement.

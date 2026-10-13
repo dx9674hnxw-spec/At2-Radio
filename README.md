@@ -51,3 +51,7 @@ pip install -e ".[test]" && pytest
 - [`docs/PROTOCOLE.md`](docs/PROTOCOLE.md) : spécification du protocole et statut de chaque élément.
 - [`docs/INVENTAIRE.md`](docs/INVENTAIRE.md) : fonctions de l'application officielle et écarts.
 - [`vecteurs/`](vecteurs/) : fichiers de test partagés entre implémentations (Python, Swift…).
+
+## Licence
+
+Apache-2.0, voir [`LICENSE`](LICENSE) et [`NOTICE`](NOTICE). Le codec AMR (libopencore-amrnb) n'est pas inclus.
