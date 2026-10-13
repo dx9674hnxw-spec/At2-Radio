@@ -27,6 +27,7 @@
       <button type="button" data-view="radio" title="Radio"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 19.1a10 10 0 0 1 0-14.2M7.8 16.2a6 6 0 0 1 0-8.4M16.2 7.8a6 6 0 0 1 0 8.4M19.1 4.9a10 10 0 0 1 0 14.2"/><circle cx="12" cy="12" r="2"/></svg><span class="nl">Radio</span></button>
       <button type="button" data-view="channels" title="Canaux"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span class="nl">Canaux</span></button>
       <button type="button" data-view="settings" title="Réglages"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg><span class="nl">Réglages</span></button>
+      <button type="button" data-view="chat" title="Messagerie"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="nl">Messagerie</span></button>
       <span class="nav-sp"></span>
       <button type="button" data-view="diag" title="Diagnostic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17l6-6-6-6M12 19h8"/></svg><span class="nl">Diagnostic</span></button>
     </nav>
@@ -94,6 +95,44 @@
         <span class="tag warn" id="dirty-tag" hidden>modifications non appliquées</span>
       </div>
       <div class="settings-cols" id="settings-root"></div>
+    </section>
+  </div>
+
+  <!-- ================= Messagerie / PTT ================= -->
+  <div class="grid view" id="v-chat" hidden>
+    <section class="panel s12">
+      <h2><span class="ico i-green"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Messagerie <small id="chat-sub">session fermée</small></h2>
+      <div class="chips" style="gap:10px;margin-bottom:10px">
+        <button class="btn" type="button" id="btn-chat-open">Ouvrir la session</button>
+        <button class="btn del" type="button" id="btn-chat-close" hidden>Fermer la session</button>
+        <span class="help">Refusée si Dual Watch ou Smart Link est actif (l'app officielle fait pareil). Les textes reçus par USB ne sont pas relayés par la radio : utilise le Bluetooth pour les recevoir.</span>
+      </div>
+      <div id="chat-log" class="chatlog" aria-live="polite"></div>
+      <div class="row2" style="margin-top:12px">
+        <label>Pseudo (16 octets au plus)<input id="chat-sender" maxlength="16" value="At2Radio" autocomplete="off"></label>
+        <label>Texte (1000 octets au plus)<input id="chat-text" autocomplete="off" placeholder="Écrire un message…"></label>
+      </div>
+      <div class="chips" style="gap:10px;margin-top:10px">
+        <button class="btn" type="button" id="btn-send-text">Envoyer le texte</button>
+        <button class="btn del" type="button" id="btn-send-image">Envoyer une image</button>
+        <input type="file" id="img-file" accept="image/*" hidden>
+      </div>
+      <div class="row2" style="margin-top:14px">
+        <label>Latitude<input id="pos-lat" inputmode="decimal" placeholder="48.8566"></label>
+        <label>Longitude<input id="pos-lon" inputmode="decimal" placeholder="2.3522"></label>
+      </div>
+      <div class="chips" style="gap:10px;margin-top:10px">
+        <button class="btn del" type="button" id="btn-send-pos">Envoyer la position</button>
+        <button class="btn del" type="button" id="btn-send-sos">Envoyer un SOS (avec le texte ci-dessus)</button>
+      </div>
+    </section>
+    <section class="panel s12">
+      <h2><span class="ico i-orange"><svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3zM19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></svg></span>Push-to-talk <small id="ptt-sub">silence</small></h2>
+      <p class="help">Maintiens le bouton pour parler. Réservé aux canaux numériques ; le micro du navigateur exige https ou localhost. Le son reçu est joué ici.</p>
+      <div class="chips" style="gap:10px;margin-top:10px">
+        <button class="btn pttbtn" type="button" id="btn-ptt">Maintenir pour parler</button>
+        <span class="tag" id="ptt-tag">silence</span>
+      </div>
     </section>
   </div>
 

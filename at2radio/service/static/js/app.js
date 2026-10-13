@@ -329,6 +329,126 @@ $('#btn-apply-settings').onclick = async () => {
   else toast('Réglages appliqués et relus');
 };
 
+
+// ---------- Messagerie ----------
+const chatLog = (cls, who, html) => {
+  const box = $('#chat-log');
+  const d = document.createElement('div'); d.className = 'msg ' + cls;
+  d.innerHTML = `<span class="who">${esc(who)}</span>${html}`;
+  box.appendChild(d); box.scrollTop = box.scrollHeight;
+};
+function showIncoming(m) {
+  const who = m.sender || '?';
+  if (m.type === 'image' && m.data) chatLog('in', who, `<img alt="image reçue" src="data:image/jpeg;base64,${m.data}">`);
+  else if (m.type === 'voice') chatLog('in', who, `Message vocal reçu${m.duration_ms ? ' (' + (m.duration_ms / 1000).toFixed(1) + ' s)' : ''}`);
+  else if (m.lat != null) chatLog('in', who, `${m.type === 'sos' ? '<b>SOS</b> ' : ''}${esc(m.text || '')} 📍 ${m.lat}, ${m.lon}`);
+  else chatLog('in', who, esc(m.text || ''));
+}
+const sender = () => $('#chat-sender').value.trim() || 'At2Radio';
+function setChat(open) {
+  $('#btn-chat-open').hidden = open; $('#btn-chat-close').hidden = !open;
+  $('#chat-sub').textContent = open ? 'session ouverte' : 'session fermée';
+}
+$('#btn-chat-open').onclick = async () => {
+  try { await call('POST', `${base()}/chat/open`); setChat(true); toast('Session ouverte'); } catch (e) { fail(e); }
+};
+$('#btn-chat-close').onclick = async () => {
+  try { await call('POST', `${base()}/chat/close`); setChat(false); } catch (e) { fail(e); }
+};
+async function send(label, fn, echo) {
+  try { await fn(); chatLog('out', sender(), echo); setChat(true); return true; } catch (e) { fail(e); return false; }
+}
+$('#btn-send-text').onclick = () => {
+  const text = $('#chat-text').value.trim();
+  if (!text) return;
+  send('texte', () => call('POST', `${base()}/messages/text`, { sender: sender(), text }), esc(text))
+    .then((ok) => { if (ok) $('#chat-text').value = ''; });
+};
+$('#chat-text').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#btn-send-text').click(); });
+function readPos() {
+  const lat = Number($('#pos-lat').value.replace(',', '.')), lon = Number($('#pos-lon').value.replace(',', '.'));
+  if (!$('#pos-lat').value || !$('#pos-lon').value || !isFinite(lat) || !isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) {
+    toast('Latitude et longitude invalides', true); return null;
+  }
+  return { lat, lon };
+}
+$('#btn-send-pos').onclick = () => {
+  const p = readPos(); if (!p) return;
+  send('position', () => call('POST', `${base()}/messages/position`, { sender: sender(), ...p }), `📍 ${p.lat}, ${p.lon}`);
+};
+$('#btn-send-sos').onclick = () => {
+  const p = readPos(); if (!p) return;
+  if (!confirmDanger('Envoyer un SOS à toutes les radios à portée ?')) return;
+  const message = $('#chat-text').value.trim() || 'SOS';
+  send('sos', () => call('POST', `${base()}/messages/sos`, { sender: sender(), message, ...p }), `<b>SOS</b> ${esc(message)} 📍 ${p.lat}, ${p.lon}`);
+};
+$('#btn-send-image').onclick = () => $('#img-file').click();
+$('#img-file').onchange = async (e) => {
+  const f = e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  try {
+    const bmp = await createImageBitmap(f);
+    const k = Math.min(1, 300 / Math.max(bmp.width, bmp.height));
+    const cv = document.createElement('canvas');
+    cv.width = Math.max(1, Math.round(bmp.width * k)); cv.height = Math.max(1, Math.round(bmp.height * k));
+    cv.getContext('2d').drawImage(bmp, 0, 0, cv.width, cv.height);
+    const blob = await new Promise((r) => cv.toBlob(r, 'image/jpeg', 0.75));
+    const q = `sender=${encodeURIComponent(sender())}&width=${bmp.width}&height=${bmp.height}`;
+    await call('POST', `${base()}/messages/image?${q}`, blob);
+    chatLog('out', sender(), `<img alt="image envoyée" src="${cv.toDataURL('image/jpeg', 0.75)}">`);
+    setChat(true);
+  } catch (err) { fail(err); }
+};
+
+// ---------- Push-to-talk ----------
+let pttWs = null, pttCtx = null, pttStream = null, pttProc = null, pttNext = 0, pttBuf = [];
+const pttTag = (t) => { $('#ptt-tag').textContent = t; $('#ptt-sub').textContent = t; };
+function playPcm(ab) {
+  if (!pttCtx) return;
+  const i16 = new Int16Array(ab), f = new Float32Array(i16.length);
+  for (let i = 0; i < i16.length; i++) f[i] = i16[i] / 32768;
+  const b = pttCtx.createBuffer(1, f.length, 8000); b.copyToChannel(f, 0);
+  const src = pttCtx.createBufferSource(); src.buffer = b; src.connect(pttCtx.destination);
+  pttNext = Math.max(pttNext, pttCtx.currentTime + 0.05);
+  src.start(pttNext); pttNext += b.duration;
+}
+async function pttStart() {
+  if (pttWs) return;
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return toast('Micro indisponible : ouvre la page en https ou en localhost.', true);
+  try {
+    pttCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 8000 });
+    pttStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+  } catch (e) { pttStop(); return toast('Micro refusé ou indisponible', true); }
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  pttWs = new WebSocket(`${proto}://${location.host}${base()}/ptt${apiKey ? '?key=' + encodeURIComponent(apiKey) : ''}`);
+  pttWs.binaryType = 'arraybuffer';
+  pttWs.onmessage = (m) => playPcm(m.data);
+  pttWs.onclose = () => { if (pttWs) { toast('Session PTT fermée par le service (canal numérique ? codec installé ?)', true); } pttStop(); };
+  pttWs.onopen = () => {
+    pttTag('émission'); $('#btn-ptt').classList.add('on');
+    const src = pttCtx.createMediaStreamSource(pttStream);
+    pttProc = pttCtx.createScriptProcessor(2048, 1, 1);
+    pttProc.onaudioprocess = (ev) => {
+      const inp = ev.inputBuffer.getChannelData(0);
+      for (let i = 0; i < inp.length; i++) pttBuf.push(Math.max(-1, Math.min(1, inp[i])) * 32767 | 0);
+      while (pttBuf.length >= 160 && pttWs && pttWs.readyState === 1) pttWs.send(Int16Array.from(pttBuf.splice(0, 160)).buffer);
+    };
+    src.connect(pttProc); pttProc.connect(pttCtx.destination);
+  };
+}
+function pttStop() {
+  const w = pttWs; pttWs = null;
+  if (w) { w.onclose = null; try { w.close(); } catch { /* déjà fermée */ } }
+  if (pttProc) { pttProc.disconnect(); pttProc = null; }
+  if (pttStream) { pttStream.getTracks().forEach((t) => t.stop()); pttStream = null; }
+  if (pttCtx) { pttCtx.close().catch(() => {}); pttCtx = null; }
+  pttBuf = []; pttNext = 0;
+  $('#btn-ptt').classList.remove('on'); pttTag('silence');
+}
+const pttBtn = $('#btn-ptt');
+pttBtn.addEventListener('pointerdown', (e) => { e.preventDefault(); pttBtn.setPointerCapture(e.pointerId); pttStart(); });
+['pointerup', 'pointercancel'].forEach((n) => pttBtn.addEventListener(n, pttStop));
+
 // ---------- Diagnostic : journal des trames en direct ----------
 let ws = null, wsFor = '', lines = [];
 function renderLog() {
@@ -350,6 +470,8 @@ function openEvents() {
     if (ev.event === 'frame') { lines.push(ev.data); if (lines.length > 2000) lines.splice(0, 500); if (NAV.cur === 'diag') renderLog(); }
     else if (ev.event === 'connection' || ev.event === 'state') refreshStatus();
     else if (ev.event === 'hello') showStatus(ev.data);
+    else if (ev.event === 'message') showIncoming(ev.data);
+    else if (ev.event === 'ptt_state' && !pttWs) pttTag(ev.data === 'rx' ? 'réception' : 'silence');
   };
   ws.onclose = () => { setTimeout(() => { if (wsFor === id) openEvents(); }, 4000); };
 }
