@@ -1,0 +1,156 @@
+{
+  "description": "Charges des commandes de réglage et de requête (octet 0x00, famille, commande, corps) et trame complète.",
+  "source": "attendu = octets relus dans At2Commands.kt (application officielle) ; at2-bridge est comparé à ces valeurs à la génération",
+  "vecteurs": [
+    {
+      "nom": "canal 5 (selectChannel)",
+      "charge_hex": "0002020e010500",
+      "trame_hex": "aa55060002020e01050070b177ee"
+    },
+    {
+      "nom": "Dual Watch côté B canal 7",
+      "charge_hex": "0002020e020700",
+      "trame_hex": "aa55060002020e020700428e77ee"
+    },
+    {
+      "nom": "focus Dual Watch côté A",
+      "charge_hex": "0002020f01",
+      "trame_hex": "aa55040002020f01bd6c77ee"
+    },
+    {
+      "nom": "Dual Watch activé",
+      "charge_hex": "0002020d02",
+      "trame_hex": "aa55040002020d02bc3a77ee"
+    },
+    {
+      "nom": "Dual Watch désactivé",
+      "charge_hex": "0002020d00",
+      "trame_hex": "aa55040002020d00fe1a77ee"
+    },
+    {
+      "nom": "volume 4",
+      "charge_hex": "0002010104",
+      "trame_hex": "aa55040002010104474677ee"
+    },
+    {
+      "nom": "squelch 3",
+      "charge_hex": "0002020403",
+      "trame_hex": "aa55040002020403059077ee"
+    },
+    {
+      "nom": "temporisation 120 s",
+      "charge_hex": "000202057800",
+      "trame_hex": "aa55050002020578002a6577ee"
+    },
+    {
+      "nom": "VOX activé",
+      "charge_hex": "0002020601",
+      "trame_hex": "aa5504000202060125d677ee"
+    },
+    {
+      "nom": "sensibilité VOX 3",
+      "charge_hex": "0002020703",
+      "trame_hex": "aa5504000202070356c577ee"
+    },
+    {
+      "nom": "inhibition TX activée",
+      "charge_hex": "0002020901",
+      "trame_hex": "aa550400020209011bc677ee"
+    },
+    {
+      "nom": "intervalle TX 60 s",
+      "charge_hex": "0002020a3c00",
+      "trame_hex": "aa55050002020a3c00138877ee"
+    },
+    {
+      "nom": "réduction de bruit activée",
+      "charge_hex": "0002021101",
+      "trame_hex": "aa55040002021101c14c77ee"
+    },
+    {
+      "nom": "annonces en anglais",
+      "charge_hex": "0002010301",
+      "trame_hex": "aa55040002010301807077ee"
+    },
+    {
+      "nom": "tonalité activée",
+      "charge_hex": "0002010401",
+      "trame_hex": "aa5504000201040117e977ee"
+    },
+    {
+      "nom": "Smart Link activé",
+      "charge_hex": "0002040901",
+      "trame_hex": "aa55040002040901bb7477ee"
+    },
+    {
+      "nom": "requête volume",
+      "charge_hex": "00010101",
+      "trame_hex": "aa55030001010172f077ee"
+    },
+    {
+      "nom": "requête squelch",
+      "charge_hex": "00010204",
+      "trame_hex": "aa55030001020484f577ee"
+    },
+    {
+      "nom": "requête temporisation",
+      "charge_hex": "00010205",
+      "trame_hex": "aa550300010205a5e577ee"
+    },
+    {
+      "nom": "requête VOX",
+      "charge_hex": "00010206",
+      "trame_hex": "aa550300010206c6d577ee"
+    },
+    {
+      "nom": "requête sensibilité VOX",
+      "charge_hex": "00010207",
+      "trame_hex": "aa550300010207e7c577ee"
+    },
+    {
+      "nom": "requête inhibition TX",
+      "charge_hex": "00010209",
+      "trame_hex": "aa550300010209292477ee"
+    },
+    {
+      "nom": "requête intervalle TX",
+      "charge_hex": "0001020a",
+      "trame_hex": "aa55030001020a4a1477ee"
+    },
+    {
+      "nom": "requête réduction de bruit",
+      "charge_hex": "00010211",
+      "trame_hex": "aa55030001021110b777ee"
+    },
+    {
+      "nom": "requête Dual Watch",
+      "charge_hex": "0001020d",
+      "trame_hex": "aa55030001020dad6477ee"
+    },
+    {
+      "nom": "requête langue des annonces",
+      "charge_hex": "00010103",
+      "trame_hex": "aa55030001010330d077ee"
+    },
+    {
+      "nom": "requête tonalité",
+      "charge_hex": "00010104",
+      "trame_hex": "aa550300010104d7a077ee"
+    },
+    {
+      "nom": "requête canal courant",
+      "charge_hex": "0001020e",
+      "trame_hex": "aa55030001020ece5477ee"
+    },
+    {
+      "nom": "requête Smart Link",
+      "charge_hex": "00010409",
+      "trame_hex": "aa5503000104098f8e77ee"
+    },
+    {
+      "nom": "nom AT2_TEST",
+      "charge_hex": "000203014154325f54455354",
+      "trame_hex": "aa550b000203014154325f54455354204977ee"
+    }
+  ]
+}

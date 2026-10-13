@@ -1,0 +1,115 @@
+{
+  "description": "Canaux : lectures réelles décodées, trame d'écriture, tonalités, enregistrement de codeplug.",
+  "source": "captures matériel + at2-bridge",
+  "vecteurs": [
+    {
+      "nom": "canal 1 lu sur la radio (corps de 24 octets)",
+      "corps_hex": "010100945190029451900200000000000001000101000000",
+      "attendu": {
+        "channel": 1,
+        "rx_mhz": 430.125,
+        "tx_mhz": 430.125,
+        "rx_tone": "67.0Hz",
+        "tx_tone": "67.0Hz",
+        "busy_lock": false,
+        "bandwidth_narrow": false,
+        "high_power": true,
+        "scan_add": false,
+        "hop_on": false,
+        "mode_digital": false,
+        "encrypt_key": 0
+      },
+      "source": "capture sur radio réelle (canaux 1, 11, 12)"
+    },
+    {
+      "nom": "canal 11 lu sur la radio (corps de 24 octets)",
+      "corps_hex": "010b0034499402344994027f007f00000001000101000101",
+      "attendu": {
+        "channel": 11,
+        "rx_mhz": 432.725,
+        "tx_mhz": 432.725,
+        "rx_tone": "OFF",
+        "tx_tone": "OFF",
+        "busy_lock": false,
+        "bandwidth_narrow": false,
+        "high_power": true,
+        "scan_add": false,
+        "hop_on": false,
+        "mode_digital": true,
+        "encrypt_key": 1
+      },
+      "source": "capture sur radio réelle (canaux 1, 11, 12)"
+    },
+    {
+      "nom": "canal 12 lu sur la radio (corps de 24 octets)",
+      "corps_hex": "010c00d4cf9502d4cf95027f007f00000001000101000102",
+      "attendu": {
+        "channel": 12,
+        "rx_mhz": 433.725,
+        "tx_mhz": 433.725,
+        "rx_tone": "OFF",
+        "tx_tone": "OFF",
+        "busy_lock": false,
+        "bandwidth_narrow": false,
+        "high_power": true,
+        "scan_add": false,
+        "hop_on": false,
+        "mode_digital": true,
+        "encrypt_key": 2
+      },
+      "source": "capture sur radio réelle (canaux 1, 11, 12)"
+    },
+    {
+      "nom": "écriture du canal 12 (trame CPS complète)",
+      "trame_hex": "aa551b00120202000c00d4cf9502d4cf95027f007f00000001000101000102429377ee",
+      "source": "trame calculée par at2-bridge et envoyée à la radio ; **l'écriture n'est pas confirmée par relecture**"
+    },
+    {
+      "nom": "étiquettes de tonalité → (valeur, type, polarité)",
+      "tonalites": [
+        {
+          "etiquette": "OFF",
+          "valeur": 127,
+          "type": 0,
+          "polarite": 0
+        },
+        {
+          "etiquette": "67.0Hz",
+          "valeur": 0,
+          "type": 0,
+          "polarite": 0
+        },
+        {
+          "etiquette": "254.1Hz",
+          "valeur": 50,
+          "type": 0,
+          "polarite": 0
+        },
+        {
+          "etiquette": "D023N",
+          "valeur": 0,
+          "type": 1,
+          "polarite": 0
+        },
+        {
+          "etiquette": "D023I",
+          "valeur": 0,
+          "type": 1,
+          "polarite": 1
+        },
+        {
+          "etiquette": "D754I",
+          "valeur": 104,
+          "type": 1,
+          "polarite": 1
+        }
+      ],
+      "source": "channel.py ; tables CTCSS (51 valeurs) et DCS (104 codes)"
+    },
+    {
+      "nom": "enregistrement de 24 octets (écriture du codeplug) pour le canal 3",
+      "enregistrement_hex": "010300318da802318da8027f007f00000001010100000000",
+      "source": "channel.py, non confirmé sur matériel"
+    }
+  ]
+}

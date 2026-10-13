@@ -1,0 +1,26 @@
+{
+  "description": "Dialecte classique : AA55, longueur sur 1 octet (sans le 0x00 initial), charge commençant par 0x00, CRC16 petit-boutiste, 77EE.",
+  "source": "calculé avec at2-bridge ; format = At2FrameCodec.kt",
+  "vecteurs": [
+    {
+      "nom": "requete volume",
+      "charge_hex": "00010101",
+      "trame_hex": "aa55030001010172f077ee"
+    },
+    {
+      "nom": "volume 4",
+      "charge_hex": "0002010104",
+      "trame_hex": "aa55040002010104474677ee"
+    },
+    {
+      "nom": "canal 5",
+      "charge_hex": "0002020e010500",
+      "trame_hex": "aa55060002020e01050070b177ee"
+    },
+    {
+      "nom": "nom AT2_TEST",
+      "charge_hex": "0003014154325f54455354",
+      "trame_hex": "aa550a0003014154325f54455354423e77ee"
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "description": "Messages hors réseau : trames construites et réassemblage attendu. Expéditeur sur 16 octets complétés d'espaces, identifiant sur 4 octets grand-boutiste.",
+  "source": "at2-bridge",
+  "vecteurs": [
+    {
+      "nom": "texte court",
+      "trames_hex": [
+        "aa552400020401010000000100414c504841202020202020202020202007000100426f6e6a6f7572b13a77ee"
+      ],
+      "reassemblage_attendu": {
+        "kind": "text",
+        "msg_id": 1,
+        "sender": "ALPHA",
+        "text": "Bonjour"
+      },
+      "source": "at2-bridge ; **texte confirmé de bout en bout sur radio ; voix et image non vérifiés**"
+    },
+    {
+      "nom": "texte fragmenté (300 octets)",
+      "trames_hex": [
+        "aa551d00020401010000000200414c50484120202020202020202020202f010300b4bb77ee",
+        "aa558e0002040102000000020000006161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161bb3e77ee",
+        "aa558e0002040102000000020001006161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161682677ee",
+        "aa55310002040102000000020002006161616161616161616161616161616161616161616161616161616161616161616161616161cf5177ee"
+      ],
+      "reassemblage_attendu": {
+        "kind": "text",
+        "msg_id": 2,
+        "sender": "ALPHA",
+        "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "source": "at2-bridge ; **texte confirmé de bout en bout sur radio ; voix et image non vérifiés**"
+    },
+    {
+      "nom": "voix (2 trames AMR de 12 octets, 1 s)",
+      "trames_hex": [
+        "aa551f00020401030000000300414c504841202020202020202020202018000100010046c877ee",
+        "aa5523000204010400000003000000000102030405060708090a0b0c0d0e0f1011121314151617503777ee"
+      ],
+      "reassemblage_attendu": {
+        "kind": "voice",
+        "msg_id": 3,
+        "sender": "ALPHA",
+        "data_hex": "000102030405060708090a0b0c0d0e0f1011121314151617"
+      },
+      "source": "at2-bridge ; **texte confirmé de bout en bout sur radio ; voix et image non vérifiés**"
+    },
+    {
+      "nom": "image (200 octets factices, 300x200)",
+      "trames_hex": [
+        "aa552100020401050000000400414c5048412020202020202020202020c80002002c01c800f9aa77ee",
+        "aa558f000204010600000004000000000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f80818283b07477ee",
+        "aa554f0002040106000000040001008485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7671f77ee"
+      ],
+      "reassemblage_attendu": {
+        "kind": "image",
+        "msg_id": 4,
+        "sender": "ALPHA",
+        "data_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7"
+      },
+      "source": "at2-bridge ; **texte confirmé de bout en bout sur radio ; voix et image non vérifiés**"
+    },
+    {
+      "nom": "accusé de réception d'une trame de message",
+      "famille": 130,
+      "commande": 4,
+      "corps_hex": "0100",
+      "est_accuse": true
+    }
+  ]
+}

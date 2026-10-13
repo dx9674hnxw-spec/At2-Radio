@@ -1,0 +1,31 @@
+{
+  "description": "CRC-16/CCITT non réfléchi, polynôme 0x1021, valeur initiale 0x1234.",
+  "source": "calculé avec at2-bridge ; l'algorithme est celui de At2FrameCodec.kt (application officielle)",
+  "vecteurs": [
+    {
+      "nom": "vide",
+      "entree_hex": "",
+      "attendu_crc16": 4660
+    },
+    {
+      "nom": "un octet",
+      "entree_hex": "01",
+      "attendu_crc16": 5714
+    },
+    {
+      "nom": "requete canal 1 (CPS)",
+      "entree_hex": "110202000100",
+      "attendu_crc16": 53714
+    },
+    {
+      "nom": "volume 4",
+      "entree_hex": "02010104",
+      "attendu_crc16": 17991
+    },
+    {
+      "nom": "0..9",
+      "entree_hex": "00010203040506070809",
+      "attendu_crc16": 393
+    }
+  ]
+}

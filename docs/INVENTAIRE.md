@@ -40,6 +40,8 @@ Classés par intérêt pour At2-Radio. « Preuve » indique où lire le comporte
 | A3 | **Limites de taille** | Texte : 1000 octets UTF-8 maximum. Voix : de 600 ms à 15 s (`at2-bridge` arrondit à la seconde supérieure, minimum 1 s). | `MAX_OFFLINE_TEXT_UTF8_BYTES`, `MIN/MAX_OFFLINE_VOICE_DURATION_MS` |
 | A4 | **Pipeline d'image** | L'application a un redimensionnement dont la sortie a été vérifiée **octet pour octet** contre la bibliothèque officielle (300 px, JPEG qualité 75, passe intermédiaire JPEG qualité 100 avec correction d'orientation EXIF). `at2-bridge` utilise Pillow avec les mêmes paramètres, sans garantie d'une sortie identique. Les images officielles font 300 px au plus ; le champ largeur/hauteur annoncé est celui de l'image **d'origine** après rotation. | `OfflineImageProcessor.kt`, `tools/verification/` (images et sommes SHA-256 de référence réutilisables comme vecteurs de test) |
 
+| A5 | **Trois commandes différentes de l'officiel** (constaté en générant les vecteurs de test) | Nom de l'appareil : officiel `00 02 03 01 <nom>`, `at2-bridge` `00 03 01 <nom>`. Smart Link : officiel `00 02 04 09 <v>` (écriture) et `00 01 04 09` (requête), `at2-bridge` `00 04 09 <v>` et `00 04 09`. Le type de commande (écriture `02`, requête `01`) est omis, comme pour le changement de canal déjà corrigé. | `At2Commands.kt` ; `vecteurs/commandes.json` |
+
 ### B. Fonctions absentes
 
 | # | Fonction | Commande | Remarque |
@@ -95,7 +97,7 @@ D'après le README de l'application : programmation par USB-C et mise à jour du
 
 ## 6. Liste d'écarts à porter, dans l'ordre
 
-1. **A1** format de position et SOS (+ A2 messages prédéfinis) : interopérabilité avec l'application officielle.
+1. **A1** format de position et SOS (+ A2 messages prédéfinis), et **A5** commandes nom / Smart Link à corriger : interopérabilité avec l'application officielle.
 2. **B6 / §3** séquence d'amorçage PTT : tester sur matériel l'hypothèse du PTT analogique.
 3. **A3** limites de taille texte et voix.
 4. **A4** pipeline d'image + vecteurs de test officiels.

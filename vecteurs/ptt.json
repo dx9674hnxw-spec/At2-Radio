@@ -1,0 +1,36 @@
+{
+  "description": "PTT : session hors réseau, prise et fin de porteuse, paquets de voix (5 trames de 12 octets, cadence de 100 ms ; queue de 4 trames).",
+  "source": "at2-bridge ; PTT numérique confirmé sur matériel, analogique non fonctionnel",
+  "vecteurs": [
+    {
+      "nom": "session hors réseau activée",
+      "charge_hex": "0002040701",
+      "trame_hex": "aa55040002040701b45777ee"
+    },
+    {
+      "nom": "session hors réseau désactivée",
+      "charge_hex": "0002040700",
+      "trame_hex": "aa55040002040700954777ee"
+    },
+    {
+      "nom": "prise de porteuse",
+      "charge_hex": "0002040201",
+      "trame_hex": "aa5504000204020141a877ee"
+    },
+    {
+      "nom": "fin de porteuse",
+      "charge_hex": "0002040200",
+      "trame_hex": "aa5504000204020060b877ee"
+    },
+    {
+      "nom": "voix : 5 trames AMR de 12 octets",
+      "charge_hex": "000204030000010101010101010101010101020202020202020202020202030303030303030303030303040404040404040404040404050505050505050505050505",
+      "trame_hex": "aa554100020403000001010101010101010101010102020202020202020202020203030303030303030303030304040404040404040404040405050505050505050505050598f577ee"
+    },
+    {
+      "nom": "voix : queue de 4 trames",
+      "charge_hex": "000204030000010101010101010101010101020202020202020202020202030303030303030303030303040404040404040404040404",
+      "trame_hex": "aa5535000204030000010101010101010101010101020202020202020202020202030303030303030303030303040404040404040404040404ceb177ee"
+    }
+  ]
+}
